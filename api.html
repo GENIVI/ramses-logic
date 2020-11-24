@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Overview &mdash; ramses_logic 0.3.0 documentation</title>
+  <title>Overview &mdash; ramses_logic 0.4.0 documentation</title>
   
 
   
@@ -88,6 +88,7 @@
 <li class="toctree-l1"><a class="reference internal" href="readme_ref.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="readme_ref.html#build">Build</a></li>
 <li class="toctree-l1"><a class="reference internal" href="readme_ref.html#examples">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="readme_ref.html#license">License</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Building</span></p>
 <ul>
@@ -145,6 +146,7 @@
 <p class="caption"><span class="caption-text">ChangeLog</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="changelog_ref.html">master</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog_ref.html#v0-4-0">v0.4.0</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog_ref.html#v0-3-1">v0.3.1</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog_ref.html#v0-3-0">v0.3.0</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog_ref.html#v0-2-0">v0.2.0</a></li>
@@ -333,7 +335,7 @@ explicitly created by calling <code class="docutils literal notranslate"><span c
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Loading data from files will invalidate all previous pointers to objects in
-the:class:<cite>rlogic::LogicEngine</cite>. To avoid that, we recommend generally avoiding using
+the <a class="reference internal" href="#_CPPv4N6rlogic11LogicEngineE" title="rlogic::LogicEngine"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rlogic::LogicEngine</span></code></a>. To avoid that, we recommend generally avoiding using
 a logicengine instance which already has content to load from files, and instead always
 create a fresh instance.</p>
 </div>
@@ -1678,6 +1680,20 @@ execute scripts which are tested and verified to be benign.</p>
 </dd></dl>
 
 <dl class="cpp function">
+<dt id="_CPPv4NK6rlogic11LogicEngine8isLinkedERK9LogicNode">
+<span id="_CPPv3NK6rlogic11LogicEngine8isLinkedERK9LogicNode"></span><span id="_CPPv2NK6rlogic11LogicEngine8isLinkedERK9LogicNode"></span><span id="rlogic::LogicEngine::isLinked__LogicNodeCRC"></span><span class="target" id="classrlogic_1_1_logic_engine_1aced48fd1448440800c01a0da4f376f26"></span>bool <code class="sig-name descname">isLinked</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv4N6rlogic9LogicNodeE" title="rlogic::LogicNode">LogicNode</a> &amp;<em>logicNode</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK6rlogic11LogicEngine8isLinkedERK9LogicNode" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Checks if an input or output of a given <a class="reference internal" href="#classrlogic_1_1_logic_node"><span class="std std-ref">LogicNode</span></a> is linked to another <a class="reference internal" href="#classrlogic_1_1_logic_node"><span class="std std-ref">LogicNode</span></a> <dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>true if the given <a class="reference internal" href="#classrlogic_1_1_logic_node"><span class="std std-ref">LogicNode</span></a> is linked to any other <a class="reference internal" href="#classrlogic_1_1_logic_node"><span class="std std-ref">LogicNode</span></a>, false otherwise. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">logicNode</span></code>: the node to check for linkage. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="cpp function">
 <dt id="_CPPv4NK6rlogic11LogicEngine9getErrorsEv">
 <span id="_CPPv3NK6rlogic11LogicEngine9getErrorsEv"></span><span id="_CPPv2NK6rlogic11LogicEngine9getErrorsEv"></span><span id="rlogic::LogicEngine::getErrorsC"></span><span class="target" id="classrlogic_1_1_logic_engine_1ad14b1e21da2a3f3ad75c1a35a8cef8a3"></span><em class="property">const</em> std::vector&lt;std::string&gt; &amp;<code class="sig-name descname">getErrors</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK6rlogic11LogicEngine9getErrorsEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>If an internal error occurs e.g. during loading or execution of a <a class="reference internal" href="#classrlogic_1_1_lua_script"><span class="std std-ref">rlogic::LuaScript</span></a>, a detailed error description can be retrieved with this method. The list of errors is reset before each <a class="reference internal" href="#classrlogic_1_1_logic_engine_1a76582c1bc1496b485f056567551f505c"><span class="std std-ref">LogicEngine</span></a> method is called, and contains potential errors created by that method after it returns.</p>
@@ -1715,20 +1731,6 @@ execute scripts which are tested and verified to be benign.</p>
 <dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">filename</span></code>: path to file from which to load content (relative or absolute) </p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">ramsesScene</span></code>: pointer to the Ramses Scene which holds the objects referenced in the Ramses Logic file </p></li>
-</ul>
-</dd>
-</dl>
-</p>
-</dd></dl>
-
-<dl class="cpp function">
-<dt id="_CPPv4NK6rlogic11LogicEngine8isLinkedERK9LogicNode">
-<span id="_CPPv3NK6rlogic11LogicEngine8isLinkedERK9LogicNode"></span><span id="_CPPv2NK6rlogic11LogicEngine8isLinkedERK9LogicNode"></span><span id="rlogic::LogicEngine::isLinked__LogicNodeCRC"></span><span class="target" id="classrlogic_1_1_logic_engine_1aced48fd1448440800c01a0da4f376f26"></span>bool <code class="sig-name descname">isLinked</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv4N6rlogic9LogicNodeE" title="rlogic::LogicNode">LogicNode</a> &amp;<em>logicNode</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK6rlogic11LogicEngine8isLinkedERK9LogicNode" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Checks if an input or output of a given <a class="reference internal" href="#classrlogic_1_1_logic_node"><span class="std std-ref">LogicNode</span></a> is linked to another <a class="reference internal" href="#classrlogic_1_1_logic_node"><span class="std std-ref">LogicNode</span></a> <dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>true if the given <a class="reference internal" href="#classrlogic_1_1_logic_node"><span class="std std-ref">LogicNode</span></a> is linked to any other <a class="reference internal" href="#classrlogic_1_1_logic_node"><span class="std std-ref">LogicNode</span></a>, false otherwise. </p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">logicNode</span></code>: the node to check for linkage. </p></li>
 </ul>
 </dd>
 </dl>
@@ -1955,7 +1957,12 @@ execute scripts which are tested and verified to be benign.</p>
 </p></li>
 <li><p>TYPE is one of [INT|FLOAT|BOOL|STRING|VEC2F|VEC3F|VEC4F|VEC2I|VEC3I|VEC4I], or…</p></li>
 <li><p>TYPE can be also a Lua table with nested properties, obeying the same rules as above, or…</p></li>
-<li><p>TYPE can be an array declaration of the form ARRAY(n, T) where n is a positive integer, and T obeys the same rules as TYPE</p></li>
+<li><p>TYPE can be an array declaration of the form ARRAY(n, T) where:<ul>
+<li><p>n is a positive integer</p></li>
+<li><p>T obeys the same rules as TYPE, except T can not be an ARRAY itself</p></li>
+<li><p>T can be a struct, i.e. arrays of structs are supported</p></li>
+</ul>
+</p></li>
 <li><p>Each property must have a name (string) - other types like number, bool etc. are not supported as keys</p></li>
 <li><p>the run() function only accesses the IN and OUT global symbols and the properties defined by it</p></li>
 </ul>
@@ -2657,12 +2664,21 @@ execute scripts which are tested and verified to be benign.</p>
 <dt id="_CPPv4N6rlogic17RamsesNodeBindingE">
 <span id="_CPPv3N6rlogic17RamsesNodeBindingE"></span><span id="_CPPv2N6rlogic17RamsesNodeBindingE"></span><span id="rlogic::RamsesNodeBinding"></span><span class="target" id="classrlogic_1_1_ramses_node_binding"></span><em class="property">class </em><code class="sig-prename descclassname"><a class="reference internal" href="#_CPPv46rlogic" title="rlogic">rlogic</a><code class="sig-prename descclassname">::</code></code><code class="sig-name descname">RamsesNodeBinding</code> : <em class="property">public</em> <a class="reference internal" href="#_CPPv46rlogic" title="rlogic">rlogic</a>::<a class="reference internal" href="#_CPPv4N6rlogic13RamsesBindingE" title="rlogic::RamsesBinding">RamsesBinding</a><a class="headerlink" href="#_CPPv4N6rlogic17RamsesNodeBindingE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><em>#include &lt;RamsesNodeBinding.h&gt;</em><p>The <a class="reference internal" href="#classrlogic_1_1_ramses_node_binding"><span class="std std-ref">RamsesNodeBinding</span></a> is a specialization of <a class="reference internal" href="#classrlogic_1_1_logic_node"><span class="std std-ref">rlogic::LogicNode</span></a> which allows manipulation of Ramses nodes. <a class="reference internal" href="#classrlogic_1_1_ramses_node_binding"><span class="std std-ref">RamsesNodeBinding</span></a>’s can be created with <a class="reference internal" href="#classrlogic_1_1_logic_engine_1a96b8c6a7010d4b6e59b91dedde464b9c"><span class="std std-ref">rlogic::LogicEngine::createRamsesNodeBinding</span></a>.</p>
-<p>The <a class="reference internal" href="#classrlogic_1_1_ramses_node_binding"><span class="std std-ref">RamsesNodeBinding</span></a> has a fixed set of inputs which correspond to properties of ramses::Node. They have a fixed type and name: <ul class="simple">
+<p>The <a class="reference internal" href="#classrlogic_1_1_ramses_node_binding"><span class="std std-ref">RamsesNodeBinding</span></a> has a fixed set of inputs which correspond to properties of ramses::Node. They have a fixed type and name: <blockquote>
+<div><ul class="simple">
 <li><p>‘visibility’ (type bool)</p></li>
 <li><p>’rotation’ (type vec3f)</p></li>
 <li><p>’translation’ (type vec3f)</p></li>
 <li><p>’scaling’ (type vec3f)</p></li>
 </ul>
+</div></blockquote>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The ‘rotation’ property is using the right-handed XYZ Euler convention, which corresponds to the
+ramses::ERotationConvention::XYZ enum. It is imperative to use the same convention when setting/
+getting the rotation values of the bound ramses::Node to avoid unexpected transformation issues.
+We will try to make this more explicit and error-proof in future releases!</p>
+</div>
 </p>
 <p>The <a class="reference internal" href="#classrlogic_1_1_ramses_node_binding"><span class="std std-ref">RamsesNodeBinding</span></a> class has no output properties (thus <a class="reference internal" href="#classrlogic_1_1_logic_node_1a3f2229c6c400f7cc2d824927e226e2fb"><span class="std std-ref">getOutputs()</span></a> will return nullptr) because the outputs are implicitly the properties of the bound Ramses node.</p>
 <p>The <a class="reference internal" href="#classrlogic_1_1_ramses_node_binding"><span class="std std-ref">RamsesNodeBinding</span></a> is updated every time when <a class="reference internal" href="#classrlogic_1_1_logic_engine_1ac7f34383e9d0c0122cbef485ae401890"><span class="std std-ref">rlogic::LogicEngine::update()</span></a> is executed. The <a class="reference internal" href="#classrlogic_1_1_ramses_node_binding"><span class="std std-ref">RamsesNodeBinding</span></a> propagates the values of its inputs to the Ramses node properties accordingly.</p>
@@ -3083,22 +3099,12 @@ this behavior - assign some properties and others not.</p>
 
 <dl class="dir">
 <dt>
-<span class="target" id="dir_b0856f6b0d80ccb263b2f415c91f9e17"></span><em>dir</em> <code class="sig-name descname">C:/dev/ramses-logic-oss/src/include</code></dt>
+<span class="target" id="dir_d44c64559bbebec7f509842c48db8b23"></span><em>dir</em> <code class="sig-name descname">C:/dev/ramses-logic-oss/include</code></dt>
 <dd></dd></dl>
 
 <dl class="dir">
 <dt>
-<span class="target" id="dir_c83302885423c98db8ec6c513e8aab40"></span><em>dir</em> <code class="sig-name descname">C:/dev/ramses-logic-oss/src/include/public</code></dt>
-<dd></dd></dl>
-
-<dl class="dir">
-<dt>
-<span class="target" id="dir_6e2d594124c375357be1c463a2539be5"></span><em>dir</em> <code class="sig-name descname">C:/dev/ramses-logic-oss/src/include/public/ramses-logic</code></dt>
-<dd></dd></dl>
-
-<dl class="dir">
-<dt>
-<span class="target" id="dir_68267d1309a1af8e8297ef4c3efbcdba"></span><em>dir</em> <code class="sig-name descname">C:/dev/ramses-logic-oss/src</code></dt>
+<span class="target" id="dir_f445d12a706105b74e886b140577c3d0"></span><em>dir</em> <code class="sig-name descname">C:/dev/ramses-logic-oss/include/ramses-logic</code></dt>
 <dd></dd></dl>
 
 </div>

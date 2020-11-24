@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Example with Ramses &mdash; ramses_logic 0.3.0 documentation</title>
+  <title>Example with Ramses &mdash; ramses_logic 0.4.0 documentation</title>
   
 
   
@@ -88,6 +88,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../readme_ref.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../readme_ref.html#build">Build</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../readme_ref.html#examples">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../readme_ref.html#license">License</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Building</span></p>
 <ul>
@@ -131,6 +132,7 @@
 <p class="caption"><span class="caption-text">ChangeLog</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../changelog_ref.html">master</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog_ref.html#v0-4-0">v0.4.0</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../changelog_ref.html#v0-3-1">v0.3.1</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../changelog_ref.html#v0-3-0">v0.3.0</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../changelog_ref.html#v0-2-0">v0.2.0</a></li>
@@ -340,9 +342,11 @@
 <span class="p">{</span>
     <span class="n">ramses</span><span class="o">::</span><span class="n">Scene</span><span class="o">*</span> <span class="n">scene</span> <span class="o">=</span> <span class="n">client</span><span class="p">.</span><span class="n">createScene</span><span class="p">(</span><span class="n">ramses</span><span class="o">::</span><span class="n">sceneId_t</span><span class="p">(</span><span class="mi">123u</span><span class="p">),</span> <span class="n">ramses</span><span class="o">::</span><span class="n">SceneConfig</span><span class="p">(),</span> <span class="s">&quot;red triangle scene&quot;</span><span class="p">);</span>
 
-    <span class="n">ramses</span><span class="o">::</span><span class="n">Camera</span><span class="o">*</span> <span class="n">camera</span> <span class="o">=</span> <span class="n">scene</span><span class="o">-&gt;</span><span class="n">createRemoteCamera</span><span class="p">(</span><span class="s">&quot;my camera&quot;</span><span class="p">);</span>
+    <span class="n">ramses</span><span class="o">::</span><span class="n">PerspectiveCamera</span><span class="o">*</span> <span class="n">camera</span> <span class="o">=</span> <span class="n">scene</span><span class="o">-&gt;</span><span class="n">createPerspectiveCamera</span><span class="p">();</span>
+    <span class="n">camera</span><span class="o">-&gt;</span><span class="n">setFrustum</span><span class="p">(</span><span class="mf">19.0f</span><span class="p">,</span> <span class="mf">1.0f</span><span class="p">,</span> <span class="mf">0.1f</span><span class="p">,</span> <span class="mf">100.0f</span><span class="p">);</span>
+    <span class="n">camera</span><span class="o">-&gt;</span><span class="n">setViewport</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">800</span><span class="p">,</span> <span class="mi">800</span><span class="p">);</span>
     <span class="n">camera</span><span class="o">-&gt;</span><span class="n">setTranslation</span><span class="p">(</span><span class="mf">0.0f</span><span class="p">,</span> <span class="mf">0.0f</span><span class="p">,</span> <span class="mf">5.0f</span><span class="p">);</span>
-    <span class="n">ramses</span><span class="o">::</span><span class="n">RenderPass</span><span class="o">*</span> <span class="n">renderPass</span> <span class="o">=</span> <span class="n">scene</span><span class="o">-&gt;</span><span class="n">createRenderPass</span><span class="p">(</span><span class="s">&quot;my render pass&quot;</span><span class="p">);</span>
+    <span class="n">ramses</span><span class="o">::</span><span class="n">RenderPass</span><span class="o">*</span> <span class="n">renderPass</span> <span class="o">=</span> <span class="n">scene</span><span class="o">-&gt;</span><span class="n">createRenderPass</span><span class="p">();</span>
     <span class="n">renderPass</span><span class="o">-&gt;</span><span class="n">setClearFlags</span><span class="p">(</span><span class="n">ramses</span><span class="o">::</span><span class="n">EClearFlags_None</span><span class="p">);</span>
     <span class="n">renderPass</span><span class="o">-&gt;</span><span class="n">setCamera</span><span class="p">(</span><span class="o">*</span><span class="n">camera</span><span class="p">);</span>
     <span class="n">ramses</span><span class="o">::</span><span class="n">RenderGroup</span><span class="o">*</span> <span class="n">renderGroup</span> <span class="o">=</span> <span class="n">scene</span><span class="o">-&gt;</span><span class="n">createRenderGroup</span><span class="p">();</span>
@@ -373,12 +377,12 @@
 <span class="s">        }</span>
 <span class="s">        </span><span class="dl">)</span><span class="s">&quot;</span><span class="p">);</span>
 
-    <span class="n">effectDesc</span><span class="p">.</span><span class="n">setUniformSemantic</span><span class="p">(</span><span class="s">&quot;mvpMatrix&quot;</span><span class="p">,</span> <span class="n">ramses</span><span class="o">::</span><span class="n">EEffectUniformSemantic_ModelViewProjectionMatrix</span><span class="p">);</span>
+    <span class="n">effectDesc</span><span class="p">.</span><span class="n">setUniformSemantic</span><span class="p">(</span><span class="s">&quot;mvpMatrix&quot;</span><span class="p">,</span> <span class="n">ramses</span><span class="o">::</span><span class="n">EEffectUniformSemantic</span><span class="o">::</span><span class="n">ModelViewProjectionMatrix</span><span class="p">);</span>
 
-    <span class="k">const</span> <span class="n">ramses</span><span class="o">::</span><span class="n">Effect</span><span class="o">*</span> <span class="n">effect</span> <span class="o">=</span> <span class="n">scene</span><span class="o">-&gt;</span><span class="n">createEffect</span><span class="p">(</span><span class="n">effectDesc</span><span class="p">,</span> <span class="n">ramses</span><span class="o">::</span><span class="n">ResourceCacheFlag_DoNotCache</span><span class="p">,</span> <span class="s">&quot;glsl shader&quot;</span><span class="p">);</span>
-    <span class="n">ramses</span><span class="o">::</span><span class="n">Appearance</span><span class="o">*</span> <span class="n">appearance</span> <span class="o">=</span> <span class="n">scene</span><span class="o">-&gt;</span><span class="n">createAppearance</span><span class="p">(</span><span class="o">*</span><span class="n">effect</span><span class="p">,</span> <span class="s">&quot;triangle appearance&quot;</span><span class="p">);</span>
+    <span class="k">const</span> <span class="n">ramses</span><span class="o">::</span><span class="n">Effect</span><span class="o">*</span> <span class="n">effect</span> <span class="o">=</span> <span class="n">scene</span><span class="o">-&gt;</span><span class="n">createEffect</span><span class="p">(</span><span class="n">effectDesc</span><span class="p">,</span> <span class="n">ramses</span><span class="o">::</span><span class="n">ResourceCacheFlag_DoNotCache</span><span class="p">);</span>
+    <span class="n">ramses</span><span class="o">::</span><span class="n">Appearance</span><span class="o">*</span> <span class="n">appearance</span> <span class="o">=</span> <span class="n">scene</span><span class="o">-&gt;</span><span class="n">createAppearance</span><span class="p">(</span><span class="o">*</span><span class="n">effect</span><span class="p">);</span>
 
-    <span class="n">ramses</span><span class="o">::</span><span class="n">GeometryBinding</span><span class="o">*</span> <span class="n">geometry</span> <span class="o">=</span> <span class="n">scene</span><span class="o">-&gt;</span><span class="n">createGeometryBinding</span><span class="p">(</span><span class="o">*</span><span class="n">effect</span><span class="p">,</span> <span class="s">&quot;triangle geometry&quot;</span><span class="p">);</span>
+    <span class="n">ramses</span><span class="o">::</span><span class="n">GeometryBinding</span><span class="o">*</span> <span class="n">geometry</span> <span class="o">=</span> <span class="n">scene</span><span class="o">-&gt;</span><span class="n">createGeometryBinding</span><span class="p">(</span><span class="o">*</span><span class="n">effect</span><span class="p">);</span>
     <span class="n">ramses</span><span class="o">::</span><span class="n">AttributeInput</span> <span class="n">positionsInput</span><span class="p">;</span>
     <span class="n">effect</span><span class="o">-&gt;</span><span class="n">findAttributeInput</span><span class="p">(</span><span class="s">&quot;a_position&quot;</span><span class="p">,</span> <span class="n">positionsInput</span><span class="p">);</span>
     <span class="n">geometry</span><span class="o">-&gt;</span><span class="n">setInputBuffer</span><span class="p">(</span><span class="n">positionsInput</span><span class="p">,</span> <span class="o">*</span><span class="n">vertexPositions</span><span class="p">);</span>

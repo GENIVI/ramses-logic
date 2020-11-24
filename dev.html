@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Understand RAMSES Logic architecture and design &mdash; ramses_logic 0.3.0 documentation</title>
+  <title>Understand RAMSES Logic architecture and design &mdash; ramses_logic 0.4.0 documentation</title>
   
 
   
@@ -87,6 +87,7 @@
 <li class="toctree-l1"><a class="reference internal" href="readme_ref.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="readme_ref.html#build">Build</a></li>
 <li class="toctree-l1"><a class="reference internal" href="readme_ref.html#examples">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="readme_ref.html#license">License</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Building</span></p>
 <ul>
@@ -121,6 +122,7 @@
 <p class="caption"><span class="caption-text">ChangeLog</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="changelog_ref.html">master</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog_ref.html#v0-4-0">v0.4.0</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog_ref.html#v0-3-1">v0.3.1</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog_ref.html#v0-3-0">v0.3.0</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog_ref.html#v0-2-0">v0.2.0</a></li>
@@ -130,6 +132,7 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Understand RAMSES Logic architecture and design</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#current-architecture">Current Architecture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#source-contents">Source contents</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#design-decision-log">Design decision log</a></li>
 </ul>
 </li>
@@ -229,7 +232,80 @@ of the code and are not afraid of technical details!</p>
 <h1>Understand RAMSES Logic architecture and design<a class="headerlink" href="#understand-ramses-logic-architecture-and-design" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="current-architecture">
 <h2>Current Architecture<a class="headerlink" href="#current-architecture" title="Permalink to this headline">¶</a></h2>
-<p>TODO (Violin/Sven)</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">Ramses</span> <span class="pre">Logic</span></code> consists of a single library which can be static or dynamic.
+It has a dependency on a <code class="docutils literal notranslate"><span class="pre">Ramses</span></code> target which can be static or dynamic library
+itself, or a custom build of <code class="docutils literal notranslate"><span class="pre">Ramses</span></code>. The following diagram illustrates the
+libraries and their dependencies:</p>
+<img alt="_images/architecture.png" src="_images/architecture.png" />
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>By default, the <code class="docutils literal notranslate"><span class="pre">Logic</span> <span class="pre">Engine</span></code> builds a client-only shared library version of
+Ramses. You can override this behavior by providing your own <code class="docutils literal notranslate"><span class="pre">Ramses</span></code> target as
+described in the <a class="reference internal" href="build.html#build-options"><span class="std std-ref">Build options</span></a>.</p>
+</div>
+</div>
+<div class="section" id="source-contents">
+<h2>Source contents<a class="headerlink" href="#source-contents" title="Permalink to this headline">¶</a></h2>
+<p>The following list gives a rough overview which parts of the logic engine
+reside in which part of the source tree:</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>include/</dt><dd><p>Contains all public include files</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>lib/</dt><dd><ul>
+<li><dl class="simple">
+<dt>flatbuffers/</dt><dd><p>Schema files describing the flatbuffers file structure and generated flatbuffer headers</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>impl/</dt><dd><p>API classes and their corresponding Impl classes (following the pimpl pattern)</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>internals/</dt><dd><p>Classes which contain the implementation details. This is the majority of the code.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>cmake/</dt><dd><p>CMake helper files</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>examples/</dt><dd><p>Contains examples, each in its own folder</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>external/</dt><dd><p>Contains all external dependencies, as described in the <a class="reference internal" href="#current-architecture"><span class="std std-ref">Current Architecture</span></a></p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>doc/</dt><dd><p>The docs source files and configuration (Sphinx and Doxygen)</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>unittests/</dt><dd><p>Unit tests, each file corresponding to a (unit) class or a subset of its functionality</p>
+</dd>
+</dl>
+</li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The minimal set of files/folders required to build the logic engine is /include, /lib,
+/cmake, /external and the root CMakeLists.txt file.</p>
+</div>
 </div>
 <div class="section" id="design-decision-log">
 <h2>Design decision log<a class="headerlink" href="#design-decision-log" title="Permalink to this headline">¶</a></h2>

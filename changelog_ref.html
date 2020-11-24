@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>master &mdash; ramses_logic 0.3.0 documentation</title>
+  <title>master &mdash; ramses_logic 0.4.0 documentation</title>
   
 
   
@@ -88,6 +88,7 @@
 <li class="toctree-l1"><a class="reference internal" href="readme_ref.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="readme_ref.html#build">Build</a></li>
 <li class="toctree-l1"><a class="reference internal" href="readme_ref.html#examples">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="readme_ref.html#license">License</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Building</span></p>
 <ul>
@@ -122,6 +123,7 @@
 <p class="caption"><span class="caption-text">ChangeLog</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">master</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#v0-4-0">v0.4.0</a></li>
 <li class="toctree-l1"><a class="reference internal" href="#v0-3-1">v0.3.1</a></li>
 <li class="toctree-l1"><a class="reference internal" href="#v0-3-0">v0.3.0</a></li>
 <li class="toctree-l1"><a class="reference internal" href="#v0-2-0">v0.2.0</a></li>
@@ -204,6 +206,30 @@
             
   <div class="section" id="master">
 <h1>master<a class="headerlink" href="#master" title="Permalink to this headline">¶</a></h1>
+</div>
+<div class="section" id="v0-4-0">
+<h1>v0.4.0<a class="headerlink" href="#v0-4-0" title="Permalink to this headline">¶</a></h1>
+<p><strong>New features</strong></p>
+<ul>
+<li><p>Support arrays of complex types</p></li>
+<li><p>Added more logging</p></li>
+<li><p>Upgrade Ramses to v27.0.2</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Uses correct rotation semantics fixed in Ramses 27.0.1</p></li>
+<li><p>Currently hardcoded right-handed XYZ Euler rotation (same as Blender default)</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+<p><strong>Improvements</strong></p>
+<ul class="simple">
+<li><p>Added [[nodiscard]] attribute to API methods where it makes sense, mostly getter Methods
+This will trigger compiler warnings if you call these methods but don’t use the result</p></li>
+<li><p>New CMake option ‘ramses-logic_FOLDER_PREFIX’ to set custom folder prefix for MSVS</p></li>
+<li><p>Restructured folders for easier source redistributions.
+See <a class="reference external" href="https://genivi.github.io/ramses-logic/dev.html#source-contents">docs</a> for more info</p></li>
+</ul>
 </div>
 <div class="section" id="v0-3-1">
 <h1>v0.3.1<a class="headerlink" href="#v0-3-1" title="Permalink to this headline">¶</a></h1>
