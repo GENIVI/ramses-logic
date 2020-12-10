@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Overview &mdash; ramses_logic 0.4.1 documentation</title>
+  <title>Overview &mdash; ramses_logic 0.4.2 documentation</title>
   
 
   
@@ -131,6 +131,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#additional-security-considerations">Additional security considerations</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="#performance">Performance</a></li>
 <li class="toctree-l1"><a class="reference internal" href="#list-of-all-examples">List of all examples</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="examples/00_minimal.html">Minimal example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples/01_properties_simple.html">Simple example with (primitive) properties</a></li>
@@ -146,6 +147,7 @@
 <p class="caption"><span class="caption-text">ChangeLog</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="changelog_ref.html">master</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog_ref.html#v0-4-2">v0.4.2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog_ref.html#v0-4-1">v0.4.1</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog_ref.html#v0-4-0">v0.4.0</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog_ref.html#v0-3-1">v0.3.1</a></li>
@@ -520,19 +522,23 @@ have a look at the <a class="reference internal" href="#list-of-all-examples"><s
 </div>
 <div class="section" id="using-lua-modules">
 <h1>Using Lua modules<a class="headerlink" href="#using-lua-modules" title="Permalink to this headline">¶</a></h1>
-<p>The <code class="docutils literal notranslate"><span class="pre">Logic</span> <span class="pre">Engine</span></code> restricts which Lua modules can be used to the standard modules
+<p>The <code class="docutils literal notranslate"><span class="pre">Logic</span> <span class="pre">Engine</span></code> restricts which Lua modules can be used to a subset of the standard modules
 of <code class="docutils literal notranslate"><span class="pre">Lua</span> <span class="pre">5.1</span></code>:</p>
 <ul class="simple">
 <li><p>Base library</p></li>
 <li><p>String</p></li>
-<li><p>I/O</p></li>
 <li><p>Table</p></li>
 <li><p>Math</p></li>
-<li><p>OS</p></li>
 <li><p>Debug</p></li>
 </ul>
 <p>For more information on the standard modules, refer to the official
 <a class="reference external" href="https://www.lua.org/manual/5.1/manual.html#5">Lua documentation</a> of the standard modules.</p>
+<p>Some of the standard modules are deliberately not supported:</p>
+<ul class="simple">
+<li><p>Security/safety concerns (loading files, getting OS/environment info)</p></li>
+<li><p>Not supported on all platforms (e.g. Android forbids direct file access)</p></li>
+<li><p>Stability/integration concerns (e.g. opening relative files in Lua makes the scripts non-relocatable)</p></li>
+</ul>
 </div>
 <div class="section" id="print-messages-from-within-lua">
 <h1>Print messages from within Lua<a class="headerlink" href="#print-messages-from-within-lua" title="Permalink to this headline">¶</a></h1>
@@ -884,6 +890,17 @@ of <code class="docutils literal notranslate"><span class="pre">Ramses</span> <s
 and force scripts into an automated testing process. We also advise to use hashsums and whitelisting techniques to only
 execute scripts which are tested and verified to be benign.</p>
 </div>
+</div>
+<div class="section" id="performance">
+<h1>Performance<a class="headerlink" href="#performance" title="Permalink to this headline">¶</a></h1>
+<p>The <code class="docutils literal notranslate"><span class="pre">Logic</span> <span class="pre">Engine</span></code> is designed to be fast and efficient, as long as the performance improvements are
+not made at cost of unreadable code. In order to be able to track and improve
+the runtime of the <code class="docutils literal notranslate"><span class="pre">Logic</span> <span class="pre">Engine</span></code>, we maintain a set of benchmarks based on the google-benchmark library.
+These benchmarks can be used to measure the time it takes for specific operations under different loads.
+We kindly ask our users and developers to report performance problems by creating a benchmark which describes
+the specific use-case which needs optimizing. Refer to the
+<a class="reference external" href="https://github.com/google/benchmark">google-benchmark docs</a> for hints how to
+design good benchmarks, to set the time measurement units, derive O-complexity, etc.</p>
 </div>
 <div class="section" id="list-of-all-examples">
 <h1>List of all examples<a class="headerlink" href="#list-of-all-examples" title="Permalink to this headline">¶</a></h1>
@@ -2431,13 +2448,21 @@ execute scripts which are tested and verified to be benign.</p>
 <dl class="cpp class">
 <dt id="_CPPv4N6rlogic23RamsesAppearanceBindingE">
 <span id="_CPPv3N6rlogic23RamsesAppearanceBindingE"></span><span id="_CPPv2N6rlogic23RamsesAppearanceBindingE"></span><span id="rlogic::RamsesAppearanceBinding"></span><span class="target" id="classrlogic_1_1_ramses_appearance_binding"></span><em class="property">class </em><code class="sig-prename descclassname"><a class="reference internal" href="#_CPPv46rlogic" title="rlogic">rlogic</a><code class="sig-prename descclassname">::</code></code><code class="sig-name descname">RamsesAppearanceBinding</code> : <em class="property">public</em> <a class="reference internal" href="#_CPPv46rlogic" title="rlogic">rlogic</a>::<a class="reference internal" href="#_CPPv4N6rlogic13RamsesBindingE" title="rlogic::RamsesBinding">RamsesBinding</a><a class="headerlink" href="#_CPPv4N6rlogic23RamsesAppearanceBindingE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><em>#include &lt;RamsesAppearanceBinding.h&gt;</em><p>The <a class="reference internal" href="#classrlogic_1_1_ramses_appearance_binding"><span class="std std-ref">RamsesAppearanceBinding</span></a> is a type of <a class="reference internal" href="#classrlogic_1_1_ramses_binding"><span class="std std-ref">rlogic::RamsesBinding</span></a> which allows the <a class="reference internal" href="#classrlogic_1_1_logic_engine"><span class="std std-ref">rlogic::LogicEngine</span></a> to control instances of ramses::Appearance. Currently, only shader uniforms are supported, except arrays and texture samplers. <a class="reference internal" href="#classrlogic_1_1_ramses_appearance_binding"><span class="std std-ref">RamsesAppearanceBinding</span></a>’s can be created with <a class="reference internal" href="#classrlogic_1_1_logic_engine_1ab90d2ffbfceabc87fc1cae4941c3c2a6"><span class="std std-ref">rlogic::LogicEngine::createRamsesAppearanceBinding</span></a>.</p>
+<dd><em>#include &lt;RamsesAppearanceBinding.h&gt;</em><p>The <a class="reference internal" href="#classrlogic_1_1_ramses_appearance_binding"><span class="std std-ref">RamsesAppearanceBinding</span></a> is a type of <a class="reference internal" href="#classrlogic_1_1_ramses_binding"><span class="std std-ref">rlogic::RamsesBinding</span></a> which allows the <a class="reference internal" href="#classrlogic_1_1_logic_engine"><span class="std std-ref">rlogic::LogicEngine</span></a> to control instances of ramses::Appearance. <a class="reference internal" href="#classrlogic_1_1_ramses_appearance_binding"><span class="std std-ref">RamsesAppearanceBinding</span></a>’s can be created with <a class="reference internal" href="#classrlogic_1_1_logic_engine_1ab90d2ffbfceabc87fc1cae4941c3c2a6"><span class="std std-ref">rlogic::LogicEngine::createRamsesAppearanceBinding</span></a>.</p>
 <p>Since the <a class="reference internal" href="#classrlogic_1_1_ramses_appearance_binding"><span class="std std-ref">RamsesAppearanceBinding</span></a> derives from <a class="reference internal" href="#classrlogic_1_1_ramses_binding"><span class="std std-ref">rlogic::RamsesBinding</span></a>, it also provides the <a class="reference internal" href="#classrlogic_1_1_logic_node_1a1c4b94e89085b5464c1af011745cb2d0"><span class="std std-ref">rlogic::LogicNode::getInputs</span></a> and <a class="reference internal" href="#classrlogic_1_1_logic_node_1a3f2229c6c400f7cc2d824927e226e2fb"><span class="std std-ref">rlogic::LogicNode::getOutputs</span></a> method. For this particular implementation, the methods behave as follows:<ul class="simple">
 <li><p><a class="reference internal" href="#classrlogic_1_1_logic_node_1a1c4b94e89085b5464c1af011745cb2d0"><span class="std std-ref">rlogic::LogicNode::getInputs</span></a>: returns an empty struct with no child properties if no ramses::Appearance is currently assigned</p></li>
 <li><p><a class="reference internal" href="#classrlogic_1_1_logic_node_1a1c4b94e89085b5464c1af011745cb2d0"><span class="std std-ref">rlogic::LogicNode::getInputs</span></a>: returns the inputs corresponding to the available shader uniforms of ramses::Appearance if such is assigned</p></li>
 <li><p><a class="reference internal" href="#classrlogic_1_1_logic_node_1a3f2229c6c400f7cc2d824927e226e2fb"><span class="std std-ref">rlogic::LogicNode::getOutputs</span></a>: returns always nullptr, because a <a class="reference internal" href="#classrlogic_1_1_ramses_appearance_binding_1a9fabe08f2c4ca3fbcbb68ec531988821"><span class="std std-ref">RamsesAppearanceBinding</span></a> does not have outputs, it implicitly controls the ramses Appearance</p></li>
 </ul>
 </p>
+<p>All shader uniforms are supported, except the following:<ul class="simple">
+<li><p>uniform arrays (e.g. vec4 u_colors[3])</p></li>
+<li><p>texture samplers of any kind</p></li>
+<li><p>matrix types (e.g. mat4, mat23 etc.)</p></li>
+<li><p>any uniform with attached semantics (e.g. display resolution) - see ramses::EEffectUniformSemantic docs</p></li>
+</ul>
+</p>
+<p>Uniform types which are not supported are not available when queried over <a class="reference internal" href="#classrlogic_1_1_logic_node_1a1c4b94e89085b5464c1af011745cb2d0"><span class="std std-ref">rlogic::LogicNode::getInputs</span></a>.</p>
 <p>Warning: any references to <a class="reference internal" href="#classrlogic_1_1_property"><span class="std std-ref">rlogic::Property</span></a> objects are invalidated after a call to <a class="reference internal" href="#classrlogic_1_1_ramses_appearance_binding_1aaf720119591107f27ba62392eab85b68"><span class="std std-ref">setRamsesAppearance</span></a>, even if the newly assigned ramses::Appearance has properties with the same name and type! </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric">Public Functions</p>
@@ -3100,12 +3125,17 @@ this behavior - assign some properties and others not.</p>
 
 <dl class="dir">
 <dt>
-<span class="target" id="dir_d44c64559bbebec7f509842c48db8b23"></span><em>dir</em> <code class="sig-name descname">C:/dev/ramses-logic/include</code></dt>
+<span class="target" id="dir_4ac99738a5238a2ca05d4fa5b88655fd"></span><em>dir</em> <code class="sig-name descname">C:/dev/ramses-logic/include</code></dt>
 <dd></dd></dl>
 
 <dl class="dir">
 <dt>
-<span class="target" id="dir_f445d12a706105b74e886b140577c3d0"></span><em>dir</em> <code class="sig-name descname">C:/dev/ramses-logic/include/ramses-logic</code></dt>
+<span class="target" id="dir_694cd71468418d913b80d200901325d8"></span><em>dir</em> <code class="sig-name descname">C:/dev/ramses-logic/include/ramses-logic</code></dt>
+<dd></dd></dl>
+
+<dl class="dir">
+<dt>
+<span class="target" id="dir_e3756d297e1798d52b6f79dfb91932ed"></span><em>dir</em> <code class="sig-name descname">C:/dev/ramses-logic</code></dt>
 <dd></dd></dl>
 
 </div>

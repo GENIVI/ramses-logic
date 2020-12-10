@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>master &mdash; ramses_logic 0.4.1 documentation</title>
+  <title>master &mdash; ramses_logic 0.4.2 documentation</title>
   
 
   
@@ -117,12 +117,14 @@
 <li class="toctree-l1"><a class="reference internal" href="api.html#additional-lua-syntax-specifics">Additional Lua syntax specifics</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html#logging">Logging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html#security-and-memory-safety">Security and memory safety</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html#performance">Performance</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html#list-of-all-examples">List of all examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html#class-index">Class Index</a></li>
 </ul>
 <p class="caption"><span class="caption-text">ChangeLog</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">master</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#v0-4-2">v0.4.2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="#v0-4-1">v0.4.1</a></li>
 <li class="toctree-l1"><a class="reference internal" href="#v0-4-0">v0.4.0</a></li>
 <li class="toctree-l1"><a class="reference internal" href="#v0-3-1">v0.3.1</a></li>
@@ -207,6 +209,26 @@
             
   <div class="section" id="master">
 <h1>master<a class="headerlink" href="#master" title="Permalink to this headline">¶</a></h1>
+</div>
+<div class="section" id="v0-4-2">
+<h1>v0.4.2<a class="headerlink" href="#v0-4-2" title="Permalink to this headline">¶</a></h1>
+<p><strong>Features</strong></p>
+<ul class="simple">
+<li><p>Added benchmarks for basic functionality. Enabled when unit tests are enabled, works based on google-benchmark.
+To run them, execute the <code class="docutils literal notranslate"><span class="pre">benchmarks</span></code> executable after having built the project in release mode for maximum accuracy.</p></li>
+</ul>
+<p><strong>Bugfixes</strong></p>
+<ul class="simple">
+<li><p>Fixed an exotic bug related to links and deserialization.
+Used to trigger when deserializing twice from file which had links.</p></li>
+<li><p>Does not wrongly create array properties out of GLSL uniforms arrays in RamsesAppearanceBinding.
+Array feature not supported there yet!</p></li>
+<li><p>Does not wrongly create LogicNode inputs out of semantic uniforms in RamsesAppearanceBinding.</p></li>
+</ul>
+<p><strong>Other</strong></p>
+<ul class="simple">
+<li><p>Removed support for i/o and os lua libs. See <a class="reference external" href="https://genivi.github.io/ramses-logic/api.html#using-lua-modules">lua module docs</a> for details</p></li>
+</ul>
 </div>
 <div class="section" id="v0-4-1">
 <h1>v0.4.1<a class="headerlink" href="#v0-4-1" title="Permalink to this headline">¶</a></h1>
