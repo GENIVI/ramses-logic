@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Index &mdash; ramses_logic 0.4.2 documentation</title>
+  <title>Index &mdash; ramses_logic 0.5.0 documentation</title>
   
 
   
@@ -103,10 +103,12 @@
 <p class="caption"><span class="caption-text">API</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="api.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html#script-creation">Script creation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html#object-lifecycle">Object lifecycle</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html#indexing-inside-and-outside-lua">Indexing inside and outside Lua</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html#creating-links-between-scripts">Creating links between scripts</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html#linking-scripts-to-ramses-scenes">Linking scripts to Ramses scenes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html#what-happens-on-update">What happens on update</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html#performance-and-caching">Performance and caching</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html#error-handling">Error handling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html#using-lua-modules">Using Lua modules</a></li>
@@ -123,6 +125,7 @@
 <p class="caption"><span class="caption-text">ChangeLog</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="changelog_ref.html">master</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog_ref.html#v0-5-0">v0.5.0</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog_ref.html#v0-4-2">v0.4.2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog_ref.html#v0-4-1">v0.4.1</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog_ref.html#v0-4-0">v0.4.0</a></li>
@@ -374,11 +377,15 @@
 </li>
       <li><a href="api.html#_CPPv4N6rlogic6LoggerE">rlogic::Logger (C++ type)</a>
 </li>
+      <li><a href="api.html#_CPPv4N6rlogic6Logger20GetLogVerbosityLimitEv">rlogic::Logger::GetLogVerbosityLimit (C++ function)</a>
+</li>
       <li><a href="api.html#_CPPv4N6rlogic6Logger14LogHandlerFuncE">rlogic::Logger::LogHandlerFunc (C++ type)</a>
 </li>
       <li><a href="api.html#_CPPv4N6rlogic6Logger17SetDefaultLoggingEb">rlogic::Logger::SetDefaultLogging (C++ function)</a>
 </li>
       <li><a href="api.html#_CPPv4N6rlogic6Logger13SetLogHandlerERK14LogHandlerFunc">rlogic::Logger::SetLogHandler (C++ function)</a>
+</li>
+      <li><a href="api.html#_CPPv4N6rlogic6Logger20SetLogVerbosityLimitE15ELogMessageType">rlogic::Logger::SetLogVerbosityLimit (C++ function)</a>
 </li>
       <li><a href="api.html#_CPPv4N6rlogic11LogicEngineE">rlogic::LogicEngine (C++ class)</a>
 </li>
@@ -392,12 +399,18 @@
 </li>
       <li><a href="api.html#_CPPv4N6rlogic11LogicEngine7destroyER9LogicNode">rlogic::LogicEngine::destroy (C++ function)</a>
 </li>
-      <li><a href="api.html#_CPPv4NK6rlogic11LogicEngine9getErrorsEv">rlogic::LogicEngine::getErrors (C++ function)</a>
+      <li><a href="api.html#_CPPv4NK6rlogic11LogicEngine21findAppearanceBindingENSt11string_viewE">rlogic::LogicEngine::findAppearanceBinding (C++ function)</a>
 </li>
-      <li><a href="api.html#_CPPv4NK6rlogic11LogicEngine8isLinkedERK9LogicNode">rlogic::LogicEngine::isLinked (C++ function)</a>
+      <li><a href="api.html#_CPPv4NK6rlogic11LogicEngine15findNodeBindingENSt11string_viewE">rlogic::LogicEngine::findNodeBinding (C++ function)</a>
+</li>
+      <li><a href="api.html#_CPPv4NK6rlogic11LogicEngine10findScriptENSt11string_viewE">rlogic::LogicEngine::findScript (C++ function)</a>
+</li>
+      <li><a href="api.html#_CPPv4NK6rlogic11LogicEngine9getErrorsEv">rlogic::LogicEngine::getErrors (C++ function)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#_CPPv4NK6rlogic11LogicEngine8isLinkedERK9LogicNode">rlogic::LogicEngine::isLinked (C++ function)</a>
+</li>
       <li><a href="api.html#_CPPv4N6rlogic11LogicEngine4linkERK8PropertyRK8Property">rlogic::LogicEngine::link (C++ function)</a>
 </li>
       <li><a href="api.html#_CPPv4N6rlogic11LogicEngine12loadFromFileENSt11string_viewEPN6ramses5SceneE">rlogic::LogicEngine::loadFromFile (C++ function)</a>
@@ -558,6 +571,8 @@
 </li>
       <li><a href="api.html#_CPPv4NK6rlogic17RamsesNodeBinding13getRamsesNodeEv">rlogic::RamsesNodeBinding::getRamsesNode (C++ function)</a>
 </li>
+      <li><a href="api.html#_CPPv4NK6rlogic17RamsesNodeBinding21getRotationConventionEv">rlogic::RamsesNodeBinding::getRotationConvention (C++ function)</a>
+</li>
       <li><a href="api.html#_CPPv4N6rlogic17RamsesNodeBinding13m_nodeBindingE">rlogic::RamsesNodeBinding::m_nodeBinding (C++ member)</a>
 </li>
       <li><a href="api.html#_CPPv4N6rlogic17RamsesNodeBindingaSERK17RamsesNodeBinding">rlogic::RamsesNodeBinding::operator= (C++ function)</a>, <a href="api.html#_CPPv4N6rlogic17RamsesNodeBindingaSERR17RamsesNodeBinding">[1]</a>
@@ -565,6 +580,8 @@
       <li><a href="api.html#_CPPv4N6rlogic17RamsesNodeBinding17RamsesNodeBindingENSt10unique_ptrIN8internal21RamsesNodeBindingImplEEE">rlogic::RamsesNodeBinding::RamsesNodeBinding (C++ function)</a>, <a href="api.html#_CPPv4N6rlogic17RamsesNodeBinding17RamsesNodeBindingERK17RamsesNodeBinding">[1]</a>, <a href="api.html#_CPPv4N6rlogic17RamsesNodeBinding17RamsesNodeBindingERR17RamsesNodeBinding">[2]</a>
 </li>
       <li><a href="api.html#_CPPv4N6rlogic17RamsesNodeBinding13setRamsesNodeEPN6ramses4NodeE">rlogic::RamsesNodeBinding::setRamsesNode (C++ function)</a>
+</li>
+      <li><a href="api.html#_CPPv4N6rlogic17RamsesNodeBinding21setRotationConventionEN6ramses19ERotationConventionE">rlogic::RamsesNodeBinding::setRotationConvention (C++ function)</a>
 </li>
       <li><a href="api.html#_CPPv4N6rlogic17RamsesNodeBindingD0Ev">rlogic::RamsesNodeBinding::~RamsesNodeBinding (C++ function)</a>
 </li>

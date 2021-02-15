@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Overview &mdash; ramses_logic 0.4.2 documentation</title>
+  <title>Overview &mdash; ramses_logic 0.5.0 documentation</title>
   
 
   
@@ -103,11 +103,18 @@
 </ul>
 <p class="caption"><span class="caption-text">API</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Overview</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Overview</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#object-types-and-their-relationships">Object types and their relationships</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#data-flow">Data flow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#save-load-to-file">Save/load to file</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="#script-creation">Script creation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="#object-lifecycle">Object lifecycle</a></li>
 <li class="toctree-l1"><a class="reference internal" href="#indexing-inside-and-outside-lua">Indexing inside and outside Lua</a></li>
 <li class="toctree-l1"><a class="reference internal" href="#creating-links-between-scripts">Creating links between scripts</a></li>
 <li class="toctree-l1"><a class="reference internal" href="#linking-scripts-to-ramses-scenes">Linking scripts to Ramses scenes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#what-happens-on-update">What happens on update</a></li>
 <li class="toctree-l1"><a class="reference internal" href="#performance-and-caching">Performance and caching</a></li>
 <li class="toctree-l1"><a class="reference internal" href="#error-handling">Error handling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="#using-lua-modules">Using Lua modules</a></li>
@@ -147,6 +154,7 @@
 <p class="caption"><span class="caption-text">ChangeLog</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="changelog_ref.html">master</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog_ref.html#v0-5-0">v0.5.0</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog_ref.html#v0-4-2">v0.4.2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog_ref.html#v0-4-1">v0.4.1</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog_ref.html#v0-4-0">v0.4.0</a></li>
@@ -237,6 +245,65 @@
 <p>Prefer learning by example? Jump straight to the <a class="reference internal" href="#list-of-all-examples"><span class="std std-ref">examples</span></a>!
 Looking for a specific class or method? Check the <a class="reference internal" href="#class-index"><span class="std std-ref">class index</span></a></p>
 </div>
+<div class="section" id="object-types-and-their-relationships">
+<h2>Object types and their relationships<a class="headerlink" href="#object-types-and-their-relationships" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">Logic</span> <span class="pre">Engine</span></code> consists of a network of <code class="docutils literal notranslate"><span class="pre">Lua</span></code> scripts with a set of inputs and outputs with
+links between them. A special type of object we call <cite>binding</cite> serves as a bridge to a Ramses scene.</p>
+<p>The following graph shows an example of such script network:</p>
+<img alt="_images/overview.svg" src="_images/overview.svg" /><p>The scripts have inputs and outputs which together define the script’s <code class="docutils literal notranslate"><span class="pre">interface</span></code>
+(<a class="reference internal" href="#script-creation"><span class="std std-ref">more info on scripts</span></a>). Scripts
+can be linked together directionally, so that the output of a script can provide its data to
+the input of another script (<a class="reference internal" href="#creating-links-between-scripts"><span class="std std-ref">more info on links</span></a>).
+Scripts can’t interact with Ramses objects directly. Instead, they
+can link to <code class="docutils literal notranslate"><span class="pre">Bindings</span></code> which are designed to “bind” <code class="docutils literal notranslate"><span class="pre">Ramses</span></code> objects and modify
+their properties’ values (node visibility, transformation values, material properties etc.) (<a class="reference internal" href="#linking-scripts-to-ramses-scenes"><span class="std std-ref">more info on bindings</span></a>).</p>
+<p>The greyed-out slots in the image above represent input properties which are neither linked nor
+have a statically configured value. In bindings, this denotes that the corresponding <code class="docutils literal notranslate"><span class="pre">Ramses</span></code> property
+is not being updated by the <code class="docutils literal notranslate"><span class="pre">Logic</span> <span class="pre">Engine</span></code> (see also <a class="reference internal" href="#data-flow"><span class="std std-ref">next section</span></a>). In scripts, these
+properties will receive a default value at runtime (0, 0.0f, “”, true etc.) unless explicitly set by the application
+logic. Usually, script inputs without a configured value or a link to other output are considered the <code class="docutils literal notranslate"><span class="pre">interface</span></code>
+of the logic network towards a runtime application, and their values are supposed to be explicitly set at runtime.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>One of the planned features of the <code class="docutils literal notranslate"><span class="pre">Logic</span> <span class="pre">Engine</span></code> is to formalize interface inputs in a special
+interface class in a future release.</p>
+</div>
+</div>
+<div class="section" id="data-flow">
+<h2>Data flow<a class="headerlink" href="#data-flow" title="Permalink to this headline">¶</a></h2>
+<p>The cornerstone of the <code class="docutils literal notranslate"><span class="pre">Logic</span> <span class="pre">Engine</span></code> is the <a class="reference internal" href="#_CPPv4N6rlogic11LogicEngine6updateEv" title="rlogic::LogicEngine::update"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">rlogic::LogicEngine::update()</span></code></a> method which
+“executes” the script network and updates the values of the <code class="docutils literal notranslate"><span class="pre">Ramses</span></code> scene bound to it. The nodes
+are executed based on a topological graph sort, where the traversal direction is given by the link
+pairs (A, B) where A is an output and B is an input property in the logic graph
+(as shown <a class="reference internal" href="#object-types-and-their-relationships"><span class="std std-ref">here</span></a>).</p>
+<p>In order to save performance, logic nodes are not executed again if none of their input values changed since
+the last update. <code class="docutils literal notranslate"><span class="pre">Bindings</span></code> are an exception to this rule - setting a value of a binding input always results in
+the value of that input being passed further to the bound <code class="docutils literal notranslate"><span class="pre">Ramses</span></code> object, regardless if the corresponding value in <code class="docutils literal notranslate"><span class="pre">Ramses</span></code> is the
+same or not. This can be useful when you want to force re-apply the value to <code class="docutils literal notranslate"><span class="pre">Ramses</span></code> e.g. you can have your own logic
+to control the visibility of all <code class="docutils literal notranslate"><span class="pre">Ramses</span></code> nodes, and only use <code class="docutils literal notranslate"><span class="pre">Logic</span> <span class="pre">Engine</span></code> to control transformation properties. In that case
+you should never set the “visibility” property of a Binding object, instead set the visibility directly on the bound ramses::Node.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>We strongly discourage setting values to <code class="docutils literal notranslate"><span class="pre">Ramses</span></code> objects and to <code class="docutils literal notranslate"><span class="pre">Ramses</span> <span class="pre">Logic</span></code> bindings in the same update cycle
+to avoid unexpected behavior. At any given time, use one <em>or</em> the other, not both mechanisms to set values!</p>
+</div>
+<p>The execution logic is slightly different for scripts and bindings. Scripts will set the values of their outputs
+based on the logic in their <code class="docutils literal notranslate"><span class="pre">run()</span></code> function, which may set all, a subset or none of the script’s outputs.
+Bindings execution logic processes each of its input slots individually and checks if
+a value was explicitly set on it (either from user code or from an incoming link). Only those inputs
+which have such value are also set on the bound <code class="docutils literal notranslate"><span class="pre">Ramses</span></code> object.</p>
+</div>
+<div class="section" id="save-load-to-file">
+<h2>Save/load to file<a class="headerlink" href="#save-load-to-file" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">Logic</span> <span class="pre">Engine</span></code> is designed to be serialized and deserialized into binary files for fast loading. The first call to
+<a class="reference internal" href="#_CPPv4N6rlogic11LogicEngine6updateEv" title="rlogic::LogicEngine::update"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">rlogic::LogicEngine::update()</span></code></a> after loading from file will execute all scripts. Bindings will only be executed if
+some or all of their inputs are linked to a script output. Binding values will only be passed further to <code class="docutils literal notranslate"><span class="pre">Ramses</span></code>
+if their values were modified, e.g. by a link which produced a different value than before saving, or if the application
+called <a class="reference internal" href="#_CPPv4I0EN6rlogic8Property3setEb1T" title="rlogic::Property::set"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">rlogic::Property::set()</span></code></a> explicitly on any of the bindings’ input properties</p>
+</div>
+</div>
+<div class="section" id="script-creation">
+<h1>Script creation<a class="headerlink" href="#script-creation" title="Permalink to this headline">¶</a></h1>
 <p>The entry point to <code class="docutils literal notranslate"><span class="pre">RAMSES</span> <span class="pre">logic</span></code> is a factory-style class <a class="reference internal" href="#_CPPv4N6rlogic11LogicEngineE" title="rlogic::LogicEngine"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rlogic::LogicEngine</span></code></a> which can
 create instances of all other types of objects supported by <code class="docutils literal notranslate"><span class="pre">RAMSES</span> <span class="pre">Logic</span></code>:</p>
 <ul class="simple">
@@ -457,12 +524,12 @@ two scripts are linked in this way, the <a class="reference internal" href="#_CP
 scripts which provide data to other scripts’ inputs are executed first. In this example, the ‘sourceScript’ will be executed before
 the ‘destionationScript’ because it provides data to it over the link.</p>
 <p>Creating links as shown above enforces a so-called ‘directed acyclic graph’, or <code class="docutils literal notranslate"><span class="pre">DAG</span></code>, to the <a class="reference internal" href="#_CPPv4N6rlogic9LogicNodeE" title="rlogic::LogicNode"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rlogic::LogicNode</span></code></a> inside a given
-<a class="reference internal" href="#_CPPv4N6rlogic11LogicEngineE" title="rlogic::LogicEngine"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rlogic::LogicEngine</span></code></a>. In order to ensure data consistency, this graph can not have cyclic dependencies, thus following error
-conditions will cause undefined behavior:</p>
+<a class="reference internal" href="#_CPPv4N6rlogic11LogicEngineE" title="rlogic::LogicEngine"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rlogic::LogicEngine</span></code></a>. In order to ensure data consistency, this graph can not have cyclic dependencies, thus following operations
+will cause an error:</p>
 <ul class="simple">
-<li><p>A <a class="reference internal" href="#_CPPv4N6rlogic9LogicNodeE" title="rlogic::LogicNode"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rlogic::LogicNode</span></code></a> can not create links to itself</p></li>
-<li><p>Node A can not be linked to node B if node B is linked to node A (links have a direction!)</p></li>
-<li><p>Any set of <a class="reference internal" href="#_CPPv4N6rlogic9LogicNodeE" title="rlogic::LogicNode"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rlogic::LogicNode</span></code></a> instances whose links form a (directed) circle, e.g. A-&gt;B-&gt;C-&gt;A</p></li>
+<li><p>Creating a link from any <a class="reference internal" href="#_CPPv4N6rlogic9LogicNodeE" title="rlogic::LogicNode"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rlogic::LogicNode</span></code></a> to itself</p></li>
+<li><p>Creating a link from node A to node B if node B is linked to node A (links have a direction and this creates a two-node loop!)</p></li>
+<li><p>Any set of <a class="reference internal" href="#_CPPv4N6rlogic9LogicNodeE" title="rlogic::LogicNode"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rlogic::LogicNode</span></code></a> instances whose links form a (directed) circle, e.g. A-&gt;B-&gt;C-&gt;A (this is caught at update time, not at link creation time)</p></li>
 </ul>
 <p>A link can be removed in a similar fashion:</p>
 <div class="highlight-cpp notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
@@ -495,12 +562,48 @@ which both <a class="reference internal" href="#_CPPv4N6rlogic9LuaScriptE" title
 </ul>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Bindings alre always ‘updated’ in the end of <a class="reference internal" href="#_CPPv4N6rlogic11LogicEngine6updateEv" title="rlogic::LogicEngine::update"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">rlogic::LogicEngine::update()</span></code></a>, regardless how they are linked. This
-ensures that updates to the <code class="docutils literal notranslate"><span class="pre">Ramses</span></code> scene are only ever applied if all of the <code class="docutils literal notranslate"><span class="pre">Lua</span></code> scripts ran without errors. This prevents
-partial graphics updates if a any of the scripts has an error.</p>
+<p>Bindings are ‘updated’ slightly differently than <a class="reference internal" href="#_CPPv4N6rlogic9LuaScriptE" title="rlogic::LuaScript"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rlogic::LuaScript</span></code></a>. A script will be executed if and only if any of
+its input values have changed since last time it was executed. A <a class="reference internal" href="#_CPPv4N6rlogic13RamsesBindingE" title="rlogic::RamsesBinding"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rlogic::RamsesBinding</span></code></a> in contrast will also check
+if its input properties have a value which was explicitly set by the user, either by direct <a class="reference internal" href="#_CPPv4I0EN6rlogic8Property3setEb1T" title="rlogic::Property::set"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">rlogic::Property::set()</span></code></a> or
+indirectly with a <a class="reference internal" href="#_CPPv4N6rlogic11LogicEngine4linkERK8PropertyRK8Property" title="rlogic::LogicEngine::link"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">rlogic::LogicEngine::link()</span></code></a>. This way, only intended changes are passed further to <code class="docutils literal notranslate"><span class="pre">Ramses</span></code> objects
+and you can mix and match different control systems. For example, you can use script logic to control the transformation properties
+of nodes, but have your own logic/code for controlling the visibility or resource loading.</p>
 </div>
-<p>If you destroy a still linked LogicNode with <a class="reference internal" href="#_CPPv4N6rlogic11LogicEngine7destroyER9LogicNode" title="rlogic::LogicEngine::destroy"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">rlogic::LogicEngine::destroy()</span></code></a>, all links from and to this <a class="reference internal" href="#_CPPv4N6rlogic9LogicNodeE" title="rlogic::LogicNode"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rlogic::LogicNode</span></code></a> will
-be removed aswell.</p>
+<p>If you destroy a LogicNode calling <a class="reference internal" href="#_CPPv4N6rlogic11LogicEngine7destroyER9LogicNode" title="rlogic::LogicEngine::destroy"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">rlogic::LogicEngine::destroy()</span></code></a>, all links from and to this <a class="reference internal" href="#_CPPv4N6rlogic9LogicNodeE" title="rlogic::LogicNode"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rlogic::LogicNode</span></code></a> will
+be automatically removed.</p>
+</div>
+<div class="section" id="what-happens-on-update">
+<h1>What happens on update<a class="headerlink" href="#what-happens-on-update" title="Permalink to this headline">¶</a></h1>
+<p>The <code class="docutils literal notranslate"><span class="pre">Logic</span> <span class="pre">Engine</span></code> manages a network of Logic Nodes of various types which are executed in every
+update loop (as triggered by <a class="reference internal" href="#_CPPv4N6rlogic11LogicEngine6updateEv" title="rlogic::LogicEngine::update"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">rlogic::LogicEngine::update()</span></code></a>). But what happens inside each update loop?</p>
+<p>First, all <a class="reference internal" href="#_CPPv4N6rlogic9LogicNodeE" title="rlogic::LogicNode"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rlogic::LogicNode</span></code></a> objects are ordered based on the links between them (as described in
+the <a class="reference internal" href="#creating-links-between-scripts"><span class="std std-ref">section explaining links</span></a>). Then, each of the nodes is executed
+according to that order, unless it does not need to be executed. A node needs to be executed if:</p>
+<ul>
+<li><p>it was never executed before, i.e.:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>it was just created</p></li>
+<li><p>it was loaded from a file</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>it was executed in a previous update loop, but the value of at least one of its inputs changed. The cause of such change can either be:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Setting the value directly over <a class="reference internal" href="#_CPPv4I0EN6rlogic8Property3setEb1T" title="rlogic::Property::set"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">rlogic::Property::set()</span></code></a>, or…</p></li>
+<li><p>An output of another <a class="reference internal" href="#_CPPv4N6rlogic9LogicNodeE" title="rlogic::LogicNode"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rlogic::LogicNode</span></code></a> which changed in the same update loop is linked to this input or…</p></li>
+<li><p>A link to this input was just created</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+<p>In other words, the network of logic nodes is traversed along the links between them, the values of nodes’ outputs
+is carried over to the linked nodes’ inputs, and if no input changed for a given node, its execution is skipped to
+save CPU cycles.</p>
+<p>The execution logic is different for each type of <a class="reference internal" href="#_CPPv4N6rlogic9LogicNodeE" title="rlogic::LogicNode"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rlogic::LogicNode</span></code></a>. <a class="reference internal" href="#_CPPv4N6rlogic9LuaScriptE" title="rlogic::LuaScript"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rlogic::LuaScript</span></code></a> instances execute their <code class="docutils literal notranslate"><span class="pre">run()</span></code> method
+while <a class="reference internal" href="#_CPPv4N6rlogic13RamsesBindingE" title="rlogic::RamsesBinding"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rlogic::RamsesBinding</span></code></a> set the values of bound Ramses objects. For more details, consult the documentation of the specific
+classes.</p>
 </div>
 <div class="section" id="performance-and-caching">
 <h1>Performance and caching<a class="headerlink" href="#performance-and-caching" title="Permalink to this headline">¶</a></h1>
@@ -616,12 +719,13 @@ further for more details.</p>
 and its scripts in a single file, we decided to not do this but instead keep the content in separate files and load/save it independently.
 This allows to have the same Ramses scene stored multiple times or with different settings, but using the same logic content,
 as well as the other way around - having different logic implementations based on the same Ramses scene. It also leaves more freedom
-to choose how to store the Ramses scene.</p>
+to choose how to store the Ramses scene. This implies that at most a single Ramses scene can be referenced at the time of saving,
+having more than one scene will result in error.</p>
 </div>
 <div class="section" id="object-lifecycle-when-saving-and-loading-to-files">
 <h2>Object lifecycle when saving and loading to files<a class="headerlink" href="#object-lifecycle-when-saving-and-loading-to-files" title="Permalink to this headline">¶</a></h2>
 <p>After loading,
-the current state of the object will be completely overwritten by the contents from the file. If you don’t want this behavior,
+the current state of the logic engine objects will be completely overwritten by the contents from the file. If you don’t want this behavior,
 use two different instances of the class - one dedicated for loading from files and nothing else.</p>
 <p>Here is a simple example which demonstrates how saving/loading from file works in the simplest case (i.e. no references to Ramses objects):</p>
 <div class="highlight-cpp notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
@@ -665,6 +769,13 @@ to specify the scene from which the references to Ramses objects should be resol
 <a class="reference internal" href="#_CPPv4N6rlogic11LogicEngine12loadFromFileENSt11string_viewEPN6ramses5SceneE" title="rlogic::LogicEngine::loadFromFile"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">rlogic::LogicEngine::loadFromFile()</span></code></a> will report error and fail. <code class="docutils literal notranslate"><span class="pre">Ramses</span> <span class="pre">Logic</span></code> makes no assumptions on the origin of the scene, its name
 or ID.</p>
 <p>For a full-fledged example, have a look at <a class="reference external" href="https://github.com/GENIVI/ramses-logic/tree/master/examples/06_serialization">the serialization example</a>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">LogicEngine</span></code> expects that immediately after loading, the state of the <code class="docutils literal notranslate"><span class="pre">Ramses</span></code> scene is the same as it was right before saving, and will not
+modify <code class="docutils literal notranslate"><span class="pre">Ramses</span></code> objects which are attached to bindings in the <code class="docutils literal notranslate"><span class="pre">LogicEngine</span></code> in its first update, unless they are linked to scripts or explicitly
+overwritten by <a class="reference internal" href="#_CPPv4I0EN6rlogic8Property3setEb1T" title="rlogic::Property::set"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">rlogic::Property::set()</span></code></a> calls after loading from the file. We strongly advice to always save and load
+both the <code class="docutils literal notranslate"><span class="pre">Ramses</span></code> scene and the <code class="docutils literal notranslate"><span class="pre">LogicEngine</span></code> scene together to avoid data inconsistencies!</p>
+</div>
 </div>
 </div>
 <div class="section" id="additional-lua-syntax-specifics">
@@ -812,8 +923,8 @@ lets the local copy of the reference point to a different value.</p>
 <li><p>Warn</p></li>
 <li><p>Error</p></li>
 </ul>
-<p>By default all internal logging messages are sended to std::cout. If you want to handle the messages yourself,
-you can register your own log handler function. This function is called each time a log message occurs.</p>
+<p>By default all internal logging messages are sent to std::cout. You can toggle this with <a class="reference internal" href="#_CPPv4N6rlogic6Logger17SetDefaultLoggingEb" title="rlogic::Logger::SetDefaultLogging"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">rlogic::Logger::SetDefaultLogging()</span></code></a>.
+In addition, it is possible to have a custom log handler function which is called each time a log message is issued.</p>
 <div class="highlight-cpp notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
@@ -844,8 +955,8 @@ you can register your own log handler function. This function is called each tim
 <p>Inside the log handler function, you get the type of the message and the message itself as a std::string_view.
 Keep in mind, that you can’t store the std::string_view. It will be invalid after the call to the log handler
 function. If you need the message for later usage, store it in a std::string.</p>
-<p>Note that having a custom logger does not disable the default logging - you have to do this explicitly
-if you don’t want to see the ramses logic default logs using <a class="reference internal" href="#_CPPv4N6rlogic6Logger17SetDefaultLoggingEb" title="rlogic::Logger::SetDefaultLogging"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">rlogic::Logger::SetDefaultLogging()</span></code></a>.</p>
+<p>The amount of logging can be configured with <code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">rlogic::Logger::SetLogVerbosity()</span></code>. This affects both the default
+logging and the custom logger.</p>
 </div>
 <div class="section" id="security-and-memory-safety">
 <h1>Security and memory safety<a class="headerlink" href="#security-and-memory-safety" title="Permalink to this headline">¶</a></h1>
@@ -1563,6 +1674,51 @@ design good benchmarks, to set the time measurement units, derive O-complexity, 
 </dd></dl>
 
 <dl class="cpp function">
+<dt id="_CPPv4NK6rlogic11LogicEngine10findScriptENSt11string_viewE">
+<span id="_CPPv3NK6rlogic11LogicEngine10findScriptENSt11string_viewE"></span><span id="_CPPv2NK6rlogic11LogicEngine10findScriptENSt11string_viewE"></span><span id="rlogic::LogicEngine::findScript__std::string_viewC"></span><span class="target" id="classrlogic_1_1_logic_engine_1af65457b96a9268698d4cc6a2a94f0da4"></span><a class="reference internal" href="#_CPPv4N6rlogic9LuaScriptE" title="rlogic::LuaScript">LuaScript</a> *<code class="sig-name descname">findScript</code><span class="sig-paren">(</span>std::string_view <em>name</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK6rlogic11LogicEngine10findScriptENSt11string_viewE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Returns a pointer to the first occurrence of a script with a given <code class="docutils literal notranslate"><span class="pre">name</span></code> if such exists, and nullptr otherwise.</p>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>a pointer to the script, or nullptr if none was found </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">name</span></code>: the name of the script to search for </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4NK6rlogic11LogicEngine15findNodeBindingENSt11string_viewE">
+<span id="_CPPv3NK6rlogic11LogicEngine15findNodeBindingENSt11string_viewE"></span><span id="_CPPv2NK6rlogic11LogicEngine15findNodeBindingENSt11string_viewE"></span><span id="rlogic::LogicEngine::findNodeBinding__std::string_viewC"></span><span class="target" id="classrlogic_1_1_logic_engine_1af7d2d9cf9048741b5eaf97c6f2e3c045"></span><a class="reference internal" href="#_CPPv4N6rlogic17RamsesNodeBindingE" title="rlogic::RamsesNodeBinding">RamsesNodeBinding</a> *<code class="sig-name descname">findNodeBinding</code><span class="sig-paren">(</span>std::string_view <em>name</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK6rlogic11LogicEngine15findNodeBindingENSt11string_viewE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Returns a pointer to the first occurrence of a node binding with a given <code class="docutils literal notranslate"><span class="pre">name</span></code> if such exists, and nullptr otherwise.</p>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>a pointer to the node binding, or nullptr if none was found </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">name</span></code>: the name of the node binding to search for </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4NK6rlogic11LogicEngine21findAppearanceBindingENSt11string_viewE">
+<span id="_CPPv3NK6rlogic11LogicEngine21findAppearanceBindingENSt11string_viewE"></span><span id="_CPPv2NK6rlogic11LogicEngine21findAppearanceBindingENSt11string_viewE"></span><span id="rlogic::LogicEngine::findAppearanceBinding__std::string_viewC"></span><span class="target" id="classrlogic_1_1_logic_engine_1a9754d0ff2f2b4f355cdb5d4d8c01189d"></span><a class="reference internal" href="#_CPPv4N6rlogic23RamsesAppearanceBindingE" title="rlogic::RamsesAppearanceBinding">RamsesAppearanceBinding</a> *<code class="sig-name descname">findAppearanceBinding</code><span class="sig-paren">(</span>std::string_view <em>name</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK6rlogic11LogicEngine21findAppearanceBindingENSt11string_viewE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Returns a pointer to the first occurrence of an appearance binding with a given <code class="docutils literal notranslate"><span class="pre">name</span></code> if such exists, and nullptr otherwise.</p>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>a pointer to the appearance binding, or nullptr if none was found </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">name</span></code>: the name of the appearance binding to search for </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="cpp function">
 <dt id="_CPPv4N6rlogic11LogicEngine23createLuaScriptFromFileENSt11string_viewENSt11string_viewE">
 <span id="_CPPv3N6rlogic11LogicEngine23createLuaScriptFromFileENSt11string_viewENSt11string_viewE"></span><span id="_CPPv2N6rlogic11LogicEngine23createLuaScriptFromFileENSt11string_viewENSt11string_viewE"></span><span id="rlogic::LogicEngine::createLuaScriptFromFile__std::string_view.std::string_view"></span><span class="target" id="classrlogic_1_1_logic_engine_1ac61b18a81df8bd857ce49cac205b9c2f"></span><a class="reference internal" href="#_CPPv4N6rlogic9LuaScriptE" title="rlogic::LuaScript">LuaScript</a> *<code class="sig-name descname">createLuaScriptFromFile</code><span class="sig-paren">(</span>std::string_view <em>filename</em>, std::string_view <em>scriptName</em> = &quot;&quot;<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6rlogic11LogicEngine23createLuaScriptFromFileENSt11string_viewENSt11string_viewE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Creates a new <a class="reference internal" href="#classrlogic_1_1_lua_script"><span class="std std-ref">rlogic::LuaScript</span></a> from an existing Lua source file. Refer to the <a class="reference internal" href="#classrlogic_1_1_lua_script"><span class="std std-ref">rlogic::LuaScript</span></a> class documentation for requirements that Lua scripts must fulfill in order to be added to the <a class="reference internal" href="#classrlogic_1_1_logic_engine_1a76582c1bc1496b485f056567551f505c"><span class="std std-ref">LogicEngine</span></a>.</p>
@@ -1647,7 +1803,7 @@ design good benchmarks, to set the time measurement units, derive O-complexity, 
 <dl class="cpp function">
 <dt id="_CPPv4N6rlogic11LogicEngine6updateEv">
 <span id="_CPPv3N6rlogic11LogicEngine6updateEv"></span><span id="_CPPv2N6rlogic11LogicEngine6updateEv"></span><span id="rlogic::LogicEngine::update"></span><span class="target" id="classrlogic_1_1_logic_engine_1ac7f34383e9d0c0122cbef485ae401890"></span>bool <code class="sig-name descname">update</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6rlogic11LogicEngine6updateEv" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Updates all <a class="reference internal" href="#classrlogic_1_1_logic_node"><span class="std std-ref">rlogic::LogicNode</span></a>’s which were created by this <a class="reference internal" href="#classrlogic_1_1_logic_engine_1a76582c1bc1496b485f056567551f505c"><span class="std std-ref">LogicEngine</span></a> instance. The order in which <a class="reference internal" href="#classrlogic_1_1_logic_node"><span class="std std-ref">rlogic::LogicNode</span></a>’s are executed is determined by the links created between them (see <a class="reference internal" href="#classrlogic_1_1_logic_engine_1ac1d4e676c6bee11ad98b7b2d816acab9"><span class="std std-ref">link</span></a> and <a class="reference internal" href="#classrlogic_1_1_logic_engine_1a985cd151793247fba1ab5f5a0449b9e6"><span class="std std-ref">unlink</span></a>). <a class="reference internal" href="#classrlogic_1_1_logic_node"><span class="std std-ref">rlogic::LogicNode</span></a>’s which don’t have any links between then are executed in arbitrary order, but the order is always the same between two invocations of <a class="reference internal" href="#classrlogic_1_1_logic_engine_1ac7f34383e9d0c0122cbef485ae401890"><span class="std std-ref">update</span></a> without any calls to <a class="reference internal" href="#classrlogic_1_1_logic_engine_1ac1d4e676c6bee11ad98b7b2d816acab9"><span class="std std-ref">link</span></a> or <a class="reference internal" href="#classrlogic_1_1_logic_engine_1a985cd151793247fba1ab5f5a0449b9e6"><span class="std std-ref">unlink</span></a> between them. As an optimization <a class="reference internal" href="#classrlogic_1_1_logic_node"><span class="std std-ref">rlogic::LogicNode</span></a>’s are only updated, if at least one input of a <a class="reference internal" href="#classrlogic_1_1_logic_node"><span class="std std-ref">rlogic::LogicNode</span></a> has changed since the last call to <a class="reference internal" href="#classrlogic_1_1_logic_engine_1ac7f34383e9d0c0122cbef485ae401890"><span class="std std-ref">update</span></a>.</p>
+<dd><p>Updates all <a class="reference internal" href="#classrlogic_1_1_logic_node"><span class="std std-ref">rlogic::LogicNode</span></a>’s which were created by this <a class="reference internal" href="#classrlogic_1_1_logic_engine_1a76582c1bc1496b485f056567551f505c"><span class="std std-ref">LogicEngine</span></a> instance. The order in which <a class="reference internal" href="#classrlogic_1_1_logic_node"><span class="std std-ref">rlogic::LogicNode</span></a>’s are executed is determined by the links created between them (see <a class="reference internal" href="#classrlogic_1_1_logic_engine_1ac1d4e676c6bee11ad98b7b2d816acab9"><span class="std std-ref">link</span></a> and <a class="reference internal" href="#classrlogic_1_1_logic_engine_1a985cd151793247fba1ab5f5a0449b9e6"><span class="std std-ref">unlink</span></a>). <a class="reference internal" href="#classrlogic_1_1_logic_node"><span class="std std-ref">rlogic::LogicNode</span></a>’s which don’t have any links between then are executed in arbitrary order, but the order is always the same between two invocations of <a class="reference internal" href="#classrlogic_1_1_logic_engine_1ac7f34383e9d0c0122cbef485ae401890"><span class="std std-ref">update</span></a> without any calls to <a class="reference internal" href="#classrlogic_1_1_logic_engine_1ac1d4e676c6bee11ad98b7b2d816acab9"><span class="std std-ref">link</span></a> or <a class="reference internal" href="#classrlogic_1_1_logic_engine_1a985cd151793247fba1ab5f5a0449b9e6"><span class="std std-ref">unlink</span></a> between them. As an optimization <a class="reference internal" href="#classrlogic_1_1_logic_node"><span class="std std-ref">rlogic::LogicNode</span></a>’s are only updated, if at least one input of a <a class="reference internal" href="#classrlogic_1_1_logic_node"><span class="std std-ref">rlogic::LogicNode</span></a> has changed since the last call to <a class="reference internal" href="#classrlogic_1_1_logic_engine_1ac7f34383e9d0c0122cbef485ae401890"><span class="std std-ref">update</span></a>. If the links between logic nodes create a loop, this method will fail with an error and will not execute any of the logic nodes.</p>
 <p>Attention! This method clears all previous errors! See also docs of <a class="reference internal" href="#classrlogic_1_1_logic_engine_1ad14b1e21da2a3f3ad75c1a35a8cef8a3"><span class="std std-ref">getErrors()</span></a></p>
 <p><dl class="simple">
 <dt><strong>Return</strong></dt><dd><p>true if the update was successful, false otherwise In case of an error, use <a class="reference internal" href="#classrlogic_1_1_logic_engine_1ad14b1e21da2a3f3ad75c1a35a8cef8a3"><span class="std std-ref">getErrors()</span></a> to obtain errors. </p>
@@ -1660,12 +1816,13 @@ design good benchmarks, to set the time measurement units, derive O-complexity, 
 <dt id="_CPPv4N6rlogic11LogicEngine4linkERK8PropertyRK8Property">
 <span id="_CPPv3N6rlogic11LogicEngine4linkERK8PropertyRK8Property"></span><span id="_CPPv2N6rlogic11LogicEngine4linkERK8PropertyRK8Property"></span><span id="rlogic::LogicEngine::link__PropertyCR.PropertyCR"></span><span class="target" id="classrlogic_1_1_logic_engine_1ac1d4e676c6bee11ad98b7b2d816acab9"></span>bool <code class="sig-name descname">link</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv4N6rlogic8PropertyE" title="rlogic::Property">Property</a> &amp;<em>sourceProperty</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv4N6rlogic8PropertyE" title="rlogic::Property">Property</a> &amp;<em>targetProperty</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6rlogic11LogicEngine4linkERK8PropertyRK8Property" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Links a property of a <a class="reference internal" href="#classrlogic_1_1_logic_node"><span class="std std-ref">rlogic::LogicNode</span></a> to another <a class="reference internal" href="#classrlogic_1_1_property"><span class="std std-ref">rlogic::Property</span></a> of another <a class="reference internal" href="#classrlogic_1_1_logic_node"><span class="std std-ref">rlogic::LogicNode</span></a>. After linking, calls to <a class="reference internal" href="#classrlogic_1_1_logic_engine_1ac7f34383e9d0c0122cbef485ae401890"><span class="std std-ref">update</span></a> will propagate the value of <code class="docutils literal notranslate"><span class="pre">sourceProperty</span></code> to the <code class="docutils literal notranslate"><span class="pre">targetProperty</span></code>. Creating links influences the order in which scripts are executed - if node A provides data to node B, then node A will be executed before node B.</p>
-<p>The <a class="reference internal" href="#classrlogic_1_1_logic_engine_1ac1d4e676c6bee11ad98b7b2d816acab9"><span class="std std-ref">link()</span></a> method will result in undefined behavior when creating links:<ul class="simple">
-<li><p>which are created between properties of the same <a class="reference internal" href="#classrlogic_1_1_logic_node"><span class="std std-ref">rlogic::LogicNode</span></a></p></li>
-<li><p>for which the <code class="docutils literal notranslate"><span class="pre">sourceProperty</span></code> is not an output (see <a class="reference internal" href="#classrlogic_1_1_logic_node_1a3f2229c6c400f7cc2d824927e226e2fb"><span class="std std-ref">rlogic::LogicNode::getOutputs()</span></a>)</p></li>
-<li><p>which create a ‘link cycle’, i.e. a set of <a class="reference internal" href="#classrlogic_1_1_logic_node"><span class="std std-ref">rlogic::LogicNode</span></a>’s which are connected in a cyclic fashion</p></li>
+<p>The <a class="reference internal" href="#classrlogic_1_1_logic_engine_1ac1d4e676c6bee11ad98b7b2d816acab9"><span class="std std-ref">link()</span></a> method will fail when:<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">sourceProperty</span></code> and <code class="docutils literal notranslate"><span class="pre">targetProperty</span></code> belong to the same <a class="reference internal" href="#classrlogic_1_1_logic_node"><span class="std std-ref">rlogic::LogicNode</span></a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sourceProperty</span></code> is not an output (see <a class="reference internal" href="#classrlogic_1_1_logic_node_1a3f2229c6c400f7cc2d824927e226e2fb"><span class="std std-ref">rlogic::LogicNode::getOutputs()</span></a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">targetProperty</span></code> is not an input (see <a class="reference internal" href="#classrlogic_1_1_logic_node_1a1c4b94e89085b5464c1af011745cb2d0"><span class="std std-ref">rlogic::LogicNode::getInputs()</span></a>)</p></li>
 </ul>
 </p>
+<p>Creating link loops will cause the next call to <a class="reference internal" href="#classrlogic_1_1_logic_engine_1ac7f34383e9d0c0122cbef485ae401890"><span class="std std-ref">update()</span></a> to fail with an error. Loops are directional, it is OK to have A-&gt;B, A-&gt;C and B-&gt;C, but is not OK to have A-&gt;B-&gt;C-&gt;A.</p>
 <p>After calling <a class="reference internal" href="#classrlogic_1_1_logic_engine_1ac1d4e676c6bee11ad98b7b2d816acab9"><span class="std std-ref">link</span></a>, the value of the <code class="docutils literal notranslate"><span class="pre">targetProperty</span></code> will not change until the next call to <a class="reference internal" href="#classrlogic_1_1_logic_engine_1ac7f34383e9d0c0122cbef485ae401890"><span class="std std-ref">update</span></a>. Creating and destroying links generally has no effect until <a class="reference internal" href="#classrlogic_1_1_logic_engine_1ac7f34383e9d0c0122cbef485ae401890"><span class="std std-ref">update</span></a> is called.</p>
 <p>Attention! This method clears all previous errors! See also docs of <a class="reference internal" href="#classrlogic_1_1_logic_engine_1ad14b1e21da2a3f3ad75c1a35a8cef8a3"><span class="std std-ref">getErrors()</span></a></p>
 <p><dl class="simple">
@@ -1726,6 +1883,7 @@ design good benchmarks, to set the time measurement units, derive O-complexity, 
 <dt id="_CPPv4N6rlogic11LogicEngine10saveToFileENSt11string_viewE">
 <span id="_CPPv3N6rlogic11LogicEngine10saveToFileENSt11string_viewE"></span><span id="_CPPv2N6rlogic11LogicEngine10saveToFileENSt11string_viewE"></span><span id="rlogic::LogicEngine::saveToFile__std::string_view"></span><span class="target" id="classrlogic_1_1_logic_engine_1a6064b35b4af8d4d13fd2bb813d4b9cf0"></span>bool <code class="sig-name descname">saveToFile</code><span class="sig-paren">(</span>std::string_view <em>filename</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6rlogic11LogicEngine10saveToFileENSt11string_viewE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Writes the whole <a class="reference internal" href="#classrlogic_1_1_logic_engine_1a76582c1bc1496b485f056567551f505c"><span class="std std-ref">LogicEngine</span></a> and all of its objects to a binary file with the given filename. The RAMSES scene potentially referenced by <a class="reference internal" href="#classrlogic_1_1_ramses_binding"><span class="std std-ref">rlogic::RamsesBinding</span></a> objects is not saved - that is left to the application. <a class="reference internal" href="#classrlogic_1_1_logic_engine_1a76582c1bc1496b485f056567551f505c"><span class="std std-ref">LogicEngine</span></a> saves the references to those object, and restores them after loading. Thus, deleting Ramses objects which are being referenced from within the <a class="reference internal" href="#classrlogic_1_1_logic_engine_1a76582c1bc1496b485f056567551f505c"><span class="std std-ref">LogicEngine</span></a> will result in errors if the Logic Engine is loaded from the file again. Note that it is not sufficient to have objects with the same name, they have to be the exact same objects as during saving! For more in-depth information regarding saving and loading, refer to the online documentation at <a class="reference external" href="https://genivi.github.io/ramses-logic/api.html#serialization-deserialization">https://genivi.github.io/ramses-logic/api.html#serialization-deserialization</a></p>
+<p>Note: The method reports error and aborts if the <a class="reference internal" href="#classrlogic_1_1_ramses_binding"><span class="std std-ref">rlogic::RamsesBinding</span></a> objects reference more than one Ramses scene (this is acceptable during runtime, but not for saving to file).</p>
 <p>Attention! This method clears all previous errors! See also docs of <a class="reference internal" href="#classrlogic_1_1_logic_engine_1ad14b1e21da2a3f3ad75c1a35a8cef8a3"><span class="std std-ref">getErrors()</span></a></p>
 <p><dl class="simple">
 <dt><strong>Return</strong></dt><dd><p>true if saving was successful, false otherwise. To get more detailed error information use <a class="reference internal" href="#classrlogic_1_1_logic_engine_1ad14b1e21da2a3f3ad75c1a35a8cef8a3"><span class="std std-ref">getErrors()</span></a> </p>
@@ -2456,7 +2614,6 @@ design good benchmarks, to set the time measurement units, derive O-complexity, 
 </ul>
 </p>
 <p>All shader uniforms are supported, except the following:<ul class="simple">
-<li><p>uniform arrays (e.g. vec4 u_colors[3])</p></li>
 <li><p>texture samplers of any kind</p></li>
 <li><p>matrix types (e.g. mat4, mat23 etc.)</p></li>
 <li><p>any uniform with attached semantics (e.g. display resolution) - see ramses::EEffectUniformSemantic docs</p></li>
@@ -2575,7 +2732,7 @@ design good benchmarks, to set the time measurement units, derive O-complexity, 
 <dl class="cpp class">
 <dt id="_CPPv4N6rlogic13RamsesBindingE">
 <span id="_CPPv3N6rlogic13RamsesBindingE"></span><span id="_CPPv2N6rlogic13RamsesBindingE"></span><span id="rlogic::RamsesBinding"></span><span class="target" id="classrlogic_1_1_ramses_binding"></span><em class="property">class </em><code class="sig-prename descclassname"><a class="reference internal" href="#_CPPv46rlogic" title="rlogic">rlogic</a><code class="sig-prename descclassname">::</code></code><code class="sig-name descname">RamsesBinding</code> : <em class="property">public</em> <a class="reference internal" href="#_CPPv46rlogic" title="rlogic">rlogic</a>::<a class="reference internal" href="#_CPPv4N6rlogic9LogicNodeE" title="rlogic::LogicNode">LogicNode</a><a class="headerlink" href="#_CPPv4N6rlogic13RamsesBindingE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><em>#include &lt;RamsesBinding.h&gt;</em><p>The <a class="reference internal" href="#classrlogic_1_1_ramses_binding"><span class="std std-ref">RamsesBinding</span></a> is just a base class for all kinds of bindings to RAMSES. It is here to distinguish internally between common LogicNodes and RAMSES bindings </p>
+<dd><em>#include &lt;RamsesBinding.h&gt;</em><p>The <a class="reference internal" href="#classrlogic_1_1_ramses_binding"><span class="std std-ref">RamsesBinding</span></a> is a shared base class for bindings to Ramses objects. For details on each type of binding, look at the derived classes. </p>
 <p>Subclassed by <a class="reference internal" href="#classrlogic_1_1_ramses_appearance_binding"><span class="std std-ref">rlogic::RamsesAppearanceBinding</span></a>, <a class="reference internal" href="#classrlogic_1_1_ramses_node_binding"><span class="std std-ref">rlogic::RamsesNodeBinding</span></a></p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric">Public Functions</p>
@@ -2689,13 +2846,13 @@ design good benchmarks, to set the time measurement units, derive O-complexity, 
 <dl class="cpp class">
 <dt id="_CPPv4N6rlogic17RamsesNodeBindingE">
 <span id="_CPPv3N6rlogic17RamsesNodeBindingE"></span><span id="_CPPv2N6rlogic17RamsesNodeBindingE"></span><span id="rlogic::RamsesNodeBinding"></span><span class="target" id="classrlogic_1_1_ramses_node_binding"></span><em class="property">class </em><code class="sig-prename descclassname"><a class="reference internal" href="#_CPPv46rlogic" title="rlogic">rlogic</a><code class="sig-prename descclassname">::</code></code><code class="sig-name descname">RamsesNodeBinding</code> : <em class="property">public</em> <a class="reference internal" href="#_CPPv46rlogic" title="rlogic">rlogic</a>::<a class="reference internal" href="#_CPPv4N6rlogic13RamsesBindingE" title="rlogic::RamsesBinding">RamsesBinding</a><a class="headerlink" href="#_CPPv4N6rlogic17RamsesNodeBindingE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><em>#include &lt;RamsesNodeBinding.h&gt;</em><p>The <a class="reference internal" href="#classrlogic_1_1_ramses_node_binding"><span class="std std-ref">RamsesNodeBinding</span></a> is a specialization of <a class="reference internal" href="#classrlogic_1_1_logic_node"><span class="std std-ref">rlogic::LogicNode</span></a> which allows manipulation of Ramses nodes. <a class="reference internal" href="#classrlogic_1_1_ramses_node_binding"><span class="std std-ref">RamsesNodeBinding</span></a>’s can be created with <a class="reference internal" href="#classrlogic_1_1_logic_engine_1a96b8c6a7010d4b6e59b91dedde464b9c"><span class="std std-ref">rlogic::LogicEngine::createRamsesNodeBinding</span></a>.</p>
-<p>The <a class="reference internal" href="#classrlogic_1_1_ramses_node_binding"><span class="std std-ref">RamsesNodeBinding</span></a> has a fixed set of inputs which correspond to properties of ramses::Node. They have a fixed type and name: <blockquote>
+<dd><em>#include &lt;RamsesNodeBinding.h&gt;</em><p>The <a class="reference internal" href="#classrlogic_1_1_ramses_node_binding"><span class="std std-ref">RamsesNodeBinding</span></a> is a type of <a class="reference internal" href="#classrlogic_1_1_ramses_binding"><span class="std std-ref">rlogic::RamsesBinding</span></a> which allows manipulation of Ramses nodes. <a class="reference internal" href="#classrlogic_1_1_ramses_node_binding"><span class="std std-ref">RamsesNodeBinding</span></a>’s can be created with <a class="reference internal" href="#classrlogic_1_1_logic_engine_1a96b8c6a7010d4b6e59b91dedde464b9c"><span class="std std-ref">rlogic::LogicEngine::createRamsesNodeBinding</span></a>.</p>
+<p>The <a class="reference internal" href="#classrlogic_1_1_ramses_node_binding"><span class="std std-ref">RamsesNodeBinding</span></a> has a fixed set of inputs which correspond to properties of ramses::Node. They have a fixed type, name, and initial value: <blockquote>
 <div><ul class="simple">
-<li><p>‘visibility’ (type bool)</p></li>
-<li><p>’rotation’ (type vec3f)</p></li>
-<li><p>’translation’ (type vec3f)</p></li>
-<li><p>’scaling’ (type vec3f)</p></li>
+<li><p>‘visibility’ (type bool) [initialized to: true]</p></li>
+<li><p>’rotation’ (type vec3f) [initialized to: (0, 0, 0)]</p></li>
+<li><p>’translation’ (type vec3f) [initialized to: (0, 0, 0)]</p></li>
+<li><p>’scaling’ (type vec3f) [initialized to: (1, 1, 1)]</p></li>
 </ul>
 </div></blockquote>
 <div class="admonition warning">
@@ -2744,6 +2901,32 @@ this behavior - assign some properties and others not.</p>
 <dd><p>Returns the currently bound Ramses node, or nullptr if none is bound.</p>
 <p><dl class="simple">
 <dt><strong>Return</strong></dt><dd><p>the currently bound Ramses node </p>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N6rlogic17RamsesNodeBinding21setRotationConventionEN6ramses19ERotationConventionE">
+<span id="_CPPv3N6rlogic17RamsesNodeBinding21setRotationConventionEN6ramses19ERotationConventionE"></span><span id="_CPPv2N6rlogic17RamsesNodeBinding21setRotationConventionEN6ramses19ERotationConventionE"></span><span id="rlogic::RamsesNodeBinding::setRotationConvention__ramses::ERotationConvention"></span><span class="target" id="classrlogic_1_1_ramses_node_binding_1a6091b42988349548a1830a57116b153a"></span>bool <code class="sig-name descname">setRotationConvention</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv46ramses" title="ramses">ramses</a>::ERotationConvention <em>rotationConvention</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6rlogic17RamsesNodeBinding21setRotationConventionEN6ramses19ERotationConventionE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Sets the rotation convention used to set the rotation values to a potentially bound ramses::Node. Default is the same as the ramses default. Use this to change the setting.</p>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>true if successful, false otherwise </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">rotationConvention</span></code>: the rotation convention to use </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4NK6rlogic17RamsesNodeBinding21getRotationConventionEv">
+<span id="_CPPv3NK6rlogic17RamsesNodeBinding21getRotationConventionEv"></span><span id="_CPPv2NK6rlogic17RamsesNodeBinding21getRotationConventionEv"></span><span id="rlogic::RamsesNodeBinding::getRotationConventionC"></span><span class="target" id="classrlogic_1_1_ramses_node_binding_1aedb9929782fbe3d5e60e36917c9f15c8"></span><a class="reference internal" href="#_CPPv46ramses" title="ramses">ramses</a>::ERotationConvention <code class="sig-name descname">getRotationConvention</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK6rlogic17RamsesNodeBinding21getRotationConventionEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Returns the currently used rotation convention for the node rotation property.</p>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>the currently used rotation convention </p>
 </dd>
 </dl>
 </p>
@@ -2883,7 +3066,7 @@ this behavior - assign some properties and others not.</p>
 <dl class="cpp enum">
 <dt id="_CPPv4N6rlogic15ELogMessageTypeE">
 <span id="_CPPv3N6rlogic15ELogMessageTypeE"></span><span id="_CPPv2N6rlogic15ELogMessageTypeE"></span><span class="target" id="namespacerlogic_1a6bd0a437ba6d5f5dc289436bbc8f9139"></span><em class="property">enum </em><code class="sig-name descname">ELogMessageType</code><a class="headerlink" href="#_CPPv4N6rlogic15ELogMessageTypeE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>ELogMessageType lists the types of available log messages. The integer represents the priority of the log messages (lower means more important and higher priority). </p>
+<dd><p>ELogMessageType lists the types of available log messages. The integer represents the priority of the log messages (lower means more important, thus higher priority). </p>
 <p><em>Values:</em></p>
 <dl class="cpp enumerator">
 <dt id="_CPPv4N6rlogic15ELogMessageType5ERRORE">
@@ -3023,6 +3206,35 @@ this behavior - assign some properties and others not.</p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric">Functions</p>
 <dl class="cpp function">
+<dt id="_CPPv4N6rlogic6Logger20SetLogVerbosityLimitE15ELogMessageType">
+<span id="_CPPv3N6rlogic6Logger20SetLogVerbosityLimitE15ELogMessageType"></span><span id="_CPPv2N6rlogic6Logger20SetLogVerbosityLimitE15ELogMessageType"></span><span id="rlogic::Logger::SetLogVerbosityLimit__ELogMessageType"></span><span class="target" id="namespacerlogic_1_1_logger_1a847f7b60fbb917d9f71e99bc815a8477"></span>void <code class="sig-name descname">SetLogVerbosityLimit</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N6rlogic15ELogMessageTypeE" title="rlogic::ELogMessageType">ELogMessageType</a> <em>verbosityLimit</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6rlogic6Logger20SetLogVerbosityLimitE15ELogMessageType" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Controls how verbose the logging is. <code class="docutils literal notranslate"><span class="pre">verbosityLimit</span></code> has the following semantics:<ul class="simple">
+<li><p>if log message has message type with higher or equal priority as verbosityLimit, then it is logged</p></li>
+<li><p>log priority is as documented by <a class="reference internal" href="#namespacerlogic_1a6bd0a437ba6d5f5dc289436bbc8f9139"><span class="std std-ref">rlogic::ELogMessageType</span></a> (Errors are more important than Warnings, etc)</p></li>
+<li><p>the default value is <a class="reference internal" href="#namespacerlogic_1a6bd0a437ba6d5f5dc289436bbc8f9139a551b723eafd6a31d444fcb2f5920fbd3"><span class="std std-ref">rlogic::ELogMessageType::INFO</span></a>, meaning that log messages are processed if they have INFO priority or higher.</p></li>
+</ul>
+</p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">verbosityLimit</span></code>: least priority a log message must have in order to be processed </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N6rlogic6Logger20GetLogVerbosityLimitEv">
+<span id="_CPPv3N6rlogic6Logger20GetLogVerbosityLimitEv"></span><span id="_CPPv2N6rlogic6Logger20GetLogVerbosityLimitEv"></span><span id="rlogic::Logger::GetLogVerbosityLimit"></span><span class="target" id="namespacerlogic_1_1_logger_1ac49123a433c32dbacc54d8fe17bf7d4e"></span><a class="reference internal" href="#_CPPv4N6rlogic15ELogMessageTypeE" title="rlogic::ELogMessageType">ELogMessageType</a> <code class="sig-name descname">GetLogVerbosityLimit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6rlogic6Logger20GetLogVerbosityLimitEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Returns the current log verbosity limit of the logger. See <a class="reference internal" href="#namespacerlogic_1_1_logger_1a847f7b60fbb917d9f71e99bc815a8477"><span class="std std-ref">rlogic::Logger::SetLogVerbosityLimit</span></a> for more info on semantics.</p>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>current log verbosity limit </p>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="cpp function">
 <dt id="_CPPv4N6rlogic6Logger13SetLogHandlerERK14LogHandlerFunc">
 <span id="_CPPv3N6rlogic6Logger13SetLogHandlerERK14LogHandlerFunc"></span><span id="_CPPv2N6rlogic6Logger13SetLogHandlerERK14LogHandlerFunc"></span><span id="rlogic::Logger::SetLogHandler__LogHandlerFuncCR"></span><span class="target" id="namespacerlogic_1_1_logger_1af091b673892ab6d770c008cebad304fa"></span>void <code class="sig-name descname">SetLogHandler</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv4N6rlogic6Logger14LogHandlerFuncE" title="rlogic::Logger::LogHandlerFunc">LogHandlerFunc</a> &amp;<em>logHandlerFunc</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6rlogic6Logger13SetLogHandlerERK14LogHandlerFunc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Sets a custom log handler function, which is called each time a log message occurs. Note: setting a custom logger incurs a slight performance cost because log messages will be assembled and reported, even if default logging is disabled (<a class="reference internal" href="#namespacerlogic_1_1_logger_1acd213813785318d3735d6f72414b88ab"><span class="std std-ref">SetDefaultLogging</span></a>).</p>
@@ -3125,17 +3337,12 @@ this behavior - assign some properties and others not.</p>
 
 <dl class="dir">
 <dt>
-<span class="target" id="dir_4ac99738a5238a2ca05d4fa5b88655fd"></span><em>dir</em> <code class="sig-name descname">C:/dev/ramses-logic/include</code></dt>
+<span class="target" id="dir_d44c64559bbebec7f509842c48db8b23"></span><em>dir</em> <code class="sig-name descname">C:/dev/ramses-logic/include</code></dt>
 <dd></dd></dl>
 
 <dl class="dir">
 <dt>
-<span class="target" id="dir_694cd71468418d913b80d200901325d8"></span><em>dir</em> <code class="sig-name descname">C:/dev/ramses-logic/include/ramses-logic</code></dt>
-<dd></dd></dl>
-
-<dl class="dir">
-<dt>
-<span class="target" id="dir_e3756d297e1798d52b6f79dfb91932ed"></span><em>dir</em> <code class="sig-name descname">C:/dev/ramses-logic</code></dt>
+<span class="target" id="dir_f445d12a706105b74e886b140577c3d0"></span><em>dir</em> <code class="sig-name descname">C:/dev/ramses-logic/include/ramses-logic</code></dt>
 <dd></dd></dl>
 
 </div>

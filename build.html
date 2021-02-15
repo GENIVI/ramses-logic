@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Cloning &mdash; ramses_logic 0.4.2 documentation</title>
+  <title>Cloning &mdash; ramses_logic 0.5.0 documentation</title>
   
 
   
@@ -104,10 +104,12 @@
 <p class="caption"><span class="caption-text">API</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="api.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html#script-creation">Script creation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html#object-lifecycle">Object lifecycle</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html#indexing-inside-and-outside-lua">Indexing inside and outside Lua</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html#creating-links-between-scripts">Creating links between scripts</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html#linking-scripts-to-ramses-scenes">Linking scripts to Ramses scenes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html#what-happens-on-update">What happens on update</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html#performance-and-caching">Performance and caching</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html#error-handling">Error handling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html#using-lua-modules">Using Lua modules</a></li>
@@ -124,6 +126,7 @@
 <p class="caption"><span class="caption-text">ChangeLog</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="changelog_ref.html">master</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog_ref.html#v0-5-0">v0.5.0</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog_ref.html#v0-4-2">v0.4.2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog_ref.html#v0-4-1">v0.4.1</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog_ref.html#v0-4-0">v0.4.0</a></li>
@@ -268,12 +271,33 @@ additional build dependencies must be present in order to run some of the visual
 things can be enabled using following CMake options:</p>
 <ul>
 <li><dl class="option-list">
+<dt><kbd><span class="option">-D<var>ramses-logic_SHARED_LIB_TARGET_NAME</var></span></kbd></dt>
+<dd><ul class="simple">
+<li><p>options: any custom target name</p></li>
+<li><p>default: ramses-logic</p></li>
+<li><p>enables setting a custom name for ramses-logic shared library target.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="option-list">
 <dt><kbd><span class="option">-D<var>ramses-logic_RAMSES_TARGET</var></span></kbd></dt>
 <dd><ul class="simple">
 <li><p>options: ramses-shared-lib-client-only, ramses-shared-lib-&lt;platform&gt;, or a custom target name</p></li>
 <li><p>default: ramses-shared-lib-client-only (will be built from <code class="docutils literal notranslate"><span class="pre">Ramses</span></code> sources)</p></li>
 <li><p>enables setting a custom Ramses target instead of building and linking Ramses from source. If set,
 and if the target exists, will use it, otherwise fallback to building from source.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="option-list">
+<dt><kbd><span class="option">-D<var>ramses-logic_BUILD_RAMSES_RENDERER</var></span></kbd></dt>
+<dd><ul class="simple">
+<li><p>options: ON/OFF</p></li>
+<li><p>default: OFF</p></li>
+<li><p>enables building the ramses renderer as part of the build. If this option is set to ON, Dramses-logic_RAMSES_TARGET has to
+be set to a shared library target of ramses which contains a renderer (e.g ramses-shared-lib-android-egl-es-3-0).</p></li>
 </ul>
 </dd>
 </dl>

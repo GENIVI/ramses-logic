@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>master &mdash; ramses_logic 0.4.2 documentation</title>
+  <title>master &mdash; ramses_logic 0.5.0 documentation</title>
   
 
   
@@ -104,10 +104,12 @@
 <p class="caption"><span class="caption-text">API</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="api.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html#script-creation">Script creation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html#object-lifecycle">Object lifecycle</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html#indexing-inside-and-outside-lua">Indexing inside and outside Lua</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html#creating-links-between-scripts">Creating links between scripts</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html#linking-scripts-to-ramses-scenes">Linking scripts to Ramses scenes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html#what-happens-on-update">What happens on update</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html#performance-and-caching">Performance and caching</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html#error-handling">Error handling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html#using-lua-modules">Using Lua modules</a></li>
@@ -124,6 +126,7 @@
 <p class="caption"><span class="caption-text">ChangeLog</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">master</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#v0-5-0">v0.5.0</a></li>
 <li class="toctree-l1"><a class="reference internal" href="#v0-4-2">v0.4.2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="#v0-4-1">v0.4.1</a></li>
 <li class="toctree-l1"><a class="reference internal" href="#v0-4-0">v0.4.0</a></li>
@@ -209,6 +212,39 @@
             
   <div class="section" id="master">
 <h1>master<a class="headerlink" href="#master" title="Permalink to this headline">¶</a></h1>
+</div>
+<div class="section" id="v0-5-0">
+<h1>v0.5.0<a class="headerlink" href="#v0-5-0" title="Permalink to this headline">¶</a></h1>
+<p>This version is API-compatible to v0.4.2, but the file-format is not backwards compatible. Please re-export
+all binary content when switching to v0.5.0!</p>
+<p><strong>Features</strong></p>
+<ul class="simple">
+<li><p>Upgraded Ramses that ships with the logic engine from 27.0.2 to 27.0.5 (backwards compatible)</p></li>
+<li><p>Added support for the ‘#’ operator on non-primitive properties.
+Semantics is same as for Lua tables - returns the number of elements in the array/struct. Also works for vec2/3/4 (returns 2/3/4)</p></li>
+<li><p>RamsesAppearanceBinding supports uniform arrays</p></li>
+<li><p>Possible to set log verbosity to dynamically adjust how much is being logged</p></li>
+<li><p>Added convenience methods find&lt;Object&gt;(name) in LogicEngine</p></li>
+<li><p>Can set rotation convention on RamsesNodeBinding. Default is still euler XYZ.</p></li>
+<li><p>RamsesNodeBinding’s visibility and scaling inputs have the same values like Ramses after initialization</p></li>
+<li><p>Possible to build with ramses renderer</p></li>
+</ul>
+<p><strong>Semantic changes</strong></p>
+<ul class="simple">
+<li><p>Changed behavior of <code class="docutils literal notranslate"><span class="pre">RamsesBinding</span></code>. See
+<a class="reference external" href="https://genivi.github.io/ramses-logic/api.html#linking-scripts-to-ramses-scenes">binding docs</a> for details.
+See <a class="reference external" href="https://genivi.github.io/ramses-logic/api.html#data-flow">data flow docs</a> for general overview
+how data flow works in the logic engine.</p></li>
+</ul>
+<p><strong>Bugfixes</strong></p>
+<ul class="simple">
+<li><p>LogicEngine::saveToFile() correctly reports error if two or more different Ramses scenes are being referenced by binding objects</p></li>
+<li><p>Logic engine crashes no more when nodes with nested links (script, array) are destroyed</p></li>
+<li><p>LogicEngine::unlink() will correctly report error when called with non-primitive properties</p></li>
+<li><p>LogicEngine::isLinked() returns consistent results for nested links (any link, also nested, will cause a node to be reported as linked)</p></li>
+<li><p>Fixed a bug where LogicNode update order was not correctly adjusted when removing and adding links to its properties</p></li>
+<li><p>Reports error when a cycle of links is created (update() and saveToFile() will fail until the cycle is resolved)</p></li>
+</ul>
 </div>
 <div class="section" id="v0-4-2">
 <h1>v0.4.2<a class="headerlink" href="#v0-4-2" title="Permalink to this headline">¶</a></h1>
