@@ -29,6 +29,9 @@ namespace rlogic
      * The RamsesCameraBinding is a type of #rlogic::RamsesBinding which allows the #rlogic::LogicEngine to control instances
      * of ramses::Camera. RamsesCameraBinding's can be created with #rlogic::LogicEngine::createRamsesCameraBinding.
      *
+     * The #RamsesCameraBinding has a static link to a ramses::Camera. After creation, #rlogic::LogicNode::getInputs will
+     * return a struct property with children equivalent to the camera settings of the provided ramses camera.
+     *
      * There are two types of ramses::Camera:
      *  - ramses::PerspectiveCamera
      *  - ramses::OrthographicCamera.
@@ -53,32 +56,15 @@ namespace rlogic
      *                             frustumProperties  --> leftPlane, rightPlane, bottomPlane, topPlane, nearPlane, farPlane
      *  - #rlogic::LogicNode::getOutputs: returns always nullptr, because a #RamsesCameraBinding does not have outputs,
      *    it implicitly controls the ramses Camera
-     * \rst
-    .. warning::
-        When a new ramses::Camera is assigned, the inputs are re-created and :func:`rlogic::LogicNode::getInputs` will return a new pointer!
-        Make sure you are not using the old one any more!
-       \endrst
      */
     class RamsesCameraBinding : public RamsesBinding
     {
     public:
         /**
-         * Links this #RamsesCameraBinding with a ramses::Camera. After this call, #rlogic::LogicNode::getInputs will
-         * return a struct property with children equivalent to the camera settings of the provided ramses \p camera. Setting the
-         * Ramses camera to nullptr will erase all inputs, and further calls with different cameras will overwrite the
-         * inputs according to the new camera. Bear in mind that after a call to #setRamsesCamera, pointers to properties of
-         * this #RamsesCameraBinding from before the call will be invalid and must be re-queried, even if some or all of
-         * the new camera's properties have the same name or type or even if you assign a pointer to the same camera again!
-         *
-         * @param camera to bind the RamsesCameraBinding to.
+         * Returns the bound ramses camera.
+         * @return the bound ramses camera
          */
-        RLOGIC_API void setRamsesCamera(ramses::Camera* camera);
-
-        /**
-         * Returns the currently assigned Ramses Camera (or nullptr if none was assigned).
-         * @return the currently bound ramses camera
-         */
-        [[nodiscard]] RLOGIC_API ramses::Camera* getRamsesCamera() const;
+        [[nodiscard]] RLOGIC_API ramses::Camera& getRamsesCamera() const;
 
         /**
          * Constructor of RamsesCameraBinding. User is not supposed to call this - RamsesCameraBindings are created by other factory classes

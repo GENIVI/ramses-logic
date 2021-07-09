@@ -6,14 +6,18 @@
 //  file, You can obtain one at https://mozilla.org/MPL/2.0/.
 //  -------------------------------------------------------------------------
 
-include "logicnode.fbs";
+include "RamsesBinding.fbs";
 
 namespace rlogic_serialization;
 
-table RamsesAppearanceBinding
+struct ResourceId
 {
-    logicnode:LogicNode;
-    ramsesAppearance:uint64;
+    resourceIdLow:uint64 = 0;
+    resourceIdHigh:uint64 = 0;
 }
 
-root_type RamsesAppearanceBinding;
+table RamsesAppearanceBinding
+{
+    base:RamsesBinding;
+    parentEffectId:ResourceId;
+}

@@ -11,6 +11,8 @@
 #include "impl/LogicNodeImpl.h"
 
 #include "internals/SolWrapper.h"
+#include "internals/SerializationMap.h"
+#include "internals/DeserializationMap.h"
 
 #include "ramses-logic/Property.h"
 #include "ramses-logic/LuaScript.h"
@@ -22,6 +24,9 @@
 namespace flatbuffers
 {
     class FlatBufferBuilder;
+
+    class FlatBufferBuilder;
+    template <typename T> struct Offset;
 }
 
 namespace rlogic_serialization
@@ -40,8 +45,17 @@ namespace rlogic::internal
     public:
         // TODO Violin replace Create static method with constructor by handling errors outside and only passing in valid data
         [[nodiscard]] static std::unique_ptr<LuaScriptImpl> Create(SolState& solState, std::string_view source, std::string_view scriptName, std::string_view filename, ErrorReporting& errorReporting);
-        [[nodiscard]] static flatbuffers::Offset<rlogic_serialization::LuaScript> Serialize(const LuaScriptImpl& luaScript, flatbuffers::FlatBufferBuilder& builder);
-        [[nodiscard]] static std::unique_ptr<LuaScriptImpl> Deserialize(SolState& solState, const rlogic_serialization::LuaScript& luaScript);
+
+        [[nodiscard]] static flatbuffers::Offset<rlogic_serialization::LuaScript> Serialize(
+            const LuaScriptImpl& luaScript,
+            flatbuffers::FlatBufferBuilder& builder,
+            SerializationMap& serializationMap);
+
+        [[nodiscard]] static std::unique_ptr<LuaScriptImpl> Deserialize(
+            SolState& solState,
+            const rlogic_serialization::LuaScript& luaScript,
+            ErrorReporting& errorReporting,
+            DeserializationMap& deserializationMap);
 
         // Move-able (noexcept); Not copy-able
         ~LuaScriptImpl() noexcept override = default;
@@ -73,7 +87,6 @@ namespace rlogic::internal
         LuaPrintFunction                        m_luaPrintFunction;
 
         static std::string BuildChunkName(std::string_view scriptName, std::string_view fileName);
-        void               initParameters();
 
         static void DefaultLuaPrintFunction(std::string_view scriptName, std::string_view message);
     };

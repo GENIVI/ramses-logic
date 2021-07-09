@@ -6,16 +6,16 @@
 //  file, You can obtain one at https://mozilla.org/MPL/2.0/.
 //  -------------------------------------------------------------------------
 
-include "logicnode.fbs";
+include "Property.fbs";
 
 namespace rlogic_serialization;
 
 table LuaScript
 {
-    logicnode:LogicNode;
+    name:string;
     filename:string;
-    source:string;
-    bytecode:[ubyte];
+    luaSourceCode:string;
+    // These are cached because they hold the property values
+    rootInput:Property;
+    rootOutput:Property;
 }
-
-root_type LuaScript;

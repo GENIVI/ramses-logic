@@ -1,5 +1,22 @@
 # master
 
+**Features**
+
+* struct properties from Lua are now sorted in ascending lexicographic order
+* loading from file or buffer data handles most error cases gracefully, and handles more error cases
+    * Ramses object type mismatches after loading result in errors
+    * Appearances must be from the same base effect after loading
+    * Corrupted data results in graceful errors, not in crashes and undefined behavior
+
+**Breaking changes**
+
+* Ramses Bindings are now statically attached to their Ramses object
+    * Ramses object is provided as reference during construction of the binding
+    * Can't be changed or set to nullptr
+    * This fixes a bug and prepares the API for better and more robust Bindings API
+* New serialization format (must re-export binary files to use this version of the logic engine)
+    * This is a preparation for the first LTS version of the logic engine (API, ABI and file format)
+
 # v0.6.2
 
 **Features**

@@ -6,14 +6,11 @@
 //  file, You can obtain one at https://mozilla.org/MPL/2.0/.
 //  -------------------------------------------------------------------------
 
-include "logicnode.fbs";
+include "RamsesBinding.fbs";
 
 namespace rlogic_serialization;
 
 table RamsesCameraBinding
 {
-    logicnode:LogicNode;
-    ramsesCamera:uint64;
+    base:RamsesBinding;
 }
-
-root_type RamsesCameraBinding;

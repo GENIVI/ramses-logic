@@ -76,25 +76,11 @@ namespace rlogic
     {
     public:
         /**
-        * Sets the target Ramses node which is bound to this RamsesNodeBinding. Use nullptr as argument to unbind.
-        * The Ramses Node is not modified until the next call to rlogic::LogicEngine::update().
-        * After a Ramses Node is unbound, its properties are no longer overwritten by rlogic::RamsesNodeBinding, but their value
-        * is also not restored to what it was before it was bound to - it keeps its current state.
-        * Bear in mind that after a call to #setRamsesNode, pointers to properties of
-        * this #RamsesNodeBinding from before the call will be invalid and must be re-queried, even if some or all of
-        * the new node's properties have the same name or type or even if you assign a pointer to the same node again!
+        * Returns the bound ramses node.
         *
-        * @param node the Ramses node to bind
-        * @return true if successful, false otherwise
+        * @return the bound ramses node
         */
-        RLOGIC_API bool setRamsesNode(ramses::Node* node);
-
-        /**
-        * Returns the currently bound Ramses node, or nullptr if none is bound.
-        *
-        * @return the currently bound Ramses node
-        */
-        [[nodiscard]] RLOGIC_API ramses::Node* getRamsesNode() const;
+        [[nodiscard]] RLOGIC_API ramses::Node& getRamsesNode() const;
 
         /**
         * Sets the rotation convention used to set the rotation values to a potentially bound ramses::Node. Default is

@@ -6,15 +6,12 @@
 //  file, You can obtain one at https://mozilla.org/MPL/2.0/.
 //  -------------------------------------------------------------------------
 
-include "logicnode.fbs";
+include "RamsesBinding.fbs";
 
 namespace rlogic_serialization;
 
 table RamsesNodeBinding
 {
-    logicnode:LogicNode;
-    ramsesNode:uint64;
+    base:RamsesBinding;
     rotationConvention:uint8;
 }
-
-root_type RamsesNodeBinding;
